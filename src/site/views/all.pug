@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+  p Все видео
+    ul
+      each video in videoList
+        li
+          a(href='/video/' + video.videoId )= video.title

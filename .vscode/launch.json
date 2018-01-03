@@ -1,0 +1,45 @@
+{
+    // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
+    // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
+    // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "syncDB",
+            "program": "${workspaceFolder}/bin/script\\syncDB.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "trends grabber",
+            "program": "${workspaceFolder}/bin/script\\trendsGrabberWorker.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "statistics grabber",
+            "program": "${workspaceFolder}/bin/script\\statisticsGrabberWorker.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "site",
+            "program": "${workspaceFolder}/bin/site/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "updateViolation",
+            "program": "${workspaceFolder}/bin/script\\updateViolation.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "decreaseStatisticsTableSize",
+            "program": "${workspaceFolder}/bin/script\\decreaseStatisticsTableSize.js"
+        }
+
+    ]
+}

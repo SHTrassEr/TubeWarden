@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  p Подозрение на накрутку лайков
+    ul
+      each video in videoListLike
+        li
+          a(href='/video/' + video.videoId )= video.title
+
+  p Подозрение на накрутку дизлайков
+    ul
+      each video in videoListDislike
+        li
+          a(href='/video/' + video.videoId )= video.title

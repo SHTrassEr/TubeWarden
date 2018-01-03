@@ -1,0 +1,35 @@
+{
+  "name": "youtube_warden",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/site/server.js"
+  },
+  "dependencies": {
+    "@types/express": "^4.11.0",
+    "@types/node": "^8.5.2",
+    "bluebird": "^3.5.1",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "del": "^3.0.0",
+    "express": "^4.16.2",
+    "fs": "0.0.1-security",
+    "googleapis": "^23.0.0",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.2.3",
+    "morgan": "~1.9.0",
+    "mysql2": "^1.5.1",
+    "node-schedule": "^1.2.5",
+    "path": "^0.12.7",
+    "pug": "2.0.0-beta11",
+    "reflect-metadata": "^0.1.10",
+    "rfr": "^1.2.3",
+    "sequelize": "^4.28.6",
+    "sequelize-typescript": "^0.6.2",
+    "serve-favicon": "~2.4.5",
+    "typescript": "^2.6.2"
+  },
+  "devDependencies": {
+  }
+}
