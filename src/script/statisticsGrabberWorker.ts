@@ -6,10 +6,17 @@ import StatisticsUpdateWorker from "../grabber/StatisticsUpdateWorker";
 var statisticsUpdateWorker: StatisticsUpdateWorker
     = new StatisticsUpdateWorker(Config.Google.key, Config.Google.maxResults, Config.Service.statistics.update);
 
-
+var isJobActive: boolean = false;
 sequelize.authenticate()
     .then(() => {
         schedule.scheduleJob(Config.Service.statistics.cron, () => {
-            statisticsUpdateWorker.process();
+            if(!isJobActive) {
+                isJobActive = true;
+                statisticsUpdateWorker.process()
+                    .then(() => {
+                        isJobActive = false;
+                    });
+            }
+
         });
     });

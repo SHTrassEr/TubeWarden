@@ -30,6 +30,5 @@
     "serve-favicon": "~2.4.5",
     "typescript": "^2.6.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

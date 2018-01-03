@@ -8,7 +8,7 @@ import {Table, Column,  Model, DataType} from "sequelize-typescript";
 })
 export default class Video extends Model<Video> {
 
-    @Column({type: DataType.BIGINT, primaryKey: true})
+    @Column({ primaryKey: true })
     videoId: string;
 
     @Column(DataType.TEXT)
