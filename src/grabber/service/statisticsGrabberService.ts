@@ -57,8 +57,9 @@ export default class StatisticsGrabberService {
             ],
             limit: reqiredItemCnt
         }).then(statisticsList => {
+            var stl: any = this.createStatisticsByResult(result);
+
             if(statisticsList.length === reqiredItemCnt) {
-                var stl: any = this.createStatisticsByResult(result);
                 var stm: Statistics = statisticsList[0];
                 statisticsList.reverse();
                 statisticsList.push(stl);
