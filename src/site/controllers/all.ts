@@ -10,7 +10,7 @@ export let getAllVideo:(req: Request, res: Response) => any  = (req: Request, re
         order: [
             ["createdAt", "DESC"]
         ],
-        limit: 50
+        limit: 500
     })
     .then((videoList) => {
         res.render("all", { title: "TubeWarden", videoList: videoList });
