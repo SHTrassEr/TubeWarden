@@ -1,6 +1,6 @@
 import Statistics  from "../../models/Statistics";
 
-var violationFactor: number = 0.10;
+var violationFactor: number = 0.04;
 var minViolationValue: number = 200;
 
 var itemCnt: number = 3;

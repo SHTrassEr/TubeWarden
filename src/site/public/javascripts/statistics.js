@@ -7,18 +7,18 @@ $(document).ready(function() {
             type: 'line',
             data: {
                 datasets: [{
-                    label: "likesCount",
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
+                    label: "Лайков",
+                    backgroundColor: '#268808',
+                    borderColor: '#268808',
                     fill: false,
                     lineTension: 0,
                     data: data.map((d) => {return {x: new Date (d.createdAt), y:d.likeCount } })
                 },
                 {
-                    label: "dislikeCount",
+                    label: "Дизлайков",
                     fill: false,
-                    backgroundColor: 'rgb(255, 132, 99)',
-                    borderColor: 'rgb(255, 132, 99)',
+                    backgroundColor: '#de1616',
+                    borderColor: '#de1616',
                     lineTension: 0,
                     data: data.map((d) => {return {x: new Date (d.createdAt), y:d.dislikeCount } })
                 }]
@@ -47,10 +47,10 @@ $(document).ready(function() {
             type: 'line',
             data: {
                 datasets: [{
-                    label: "viewCount",
+                    label: "Просмотров",
                     fill: false,
-                    backgroundColor: 'rgb(255, 80, 99)',
-                    borderColor: 'rgb(255, 80, 99)',
+                    backgroundColor: '#1664de',
+                    borderColor: '#1664de',
                     lineTension: 0,
                     data: data.map((d) => {return {x: new Date (d.createdAt), y:d.viewCount } })
                 }]
