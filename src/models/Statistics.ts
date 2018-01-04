@@ -7,7 +7,7 @@ import {Table, Column,  Model, DataType} from "sequelize-typescript";
 })
 export default class Statistics extends Model<Statistics> {
 
-    @Column(DataType.BIGINT)
+    @Column
     viewCount: number;
 
     @Column

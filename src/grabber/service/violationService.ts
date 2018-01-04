@@ -5,7 +5,7 @@ var minViolationValue: number = 200;
 
 var itemCnt: number = 3;
 
-var atLineEp: number = 0.009;
+var atLineEp: number = 0.00025;
 
 export default class ViolationService {
 
@@ -46,8 +46,8 @@ export default class ViolationService {
         var str: Statistics = arr[2];
         var y: number = ((this.getX(stm) - this.getX(stl))*(str[yf] - stl[yf])) / (this.getX(str) - this.getX(stl)) + stl[yf];
         var ey: number =  ep * y;
-        if(ey < 2) {
-            ey = 2;
+        if(ey < 1) {
+            ey = 1;
         }
         return Math.abs(stm[yf] - y) <=  ey;
     }
