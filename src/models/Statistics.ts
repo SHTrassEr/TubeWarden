@@ -20,6 +20,10 @@ export default class Statistics extends Model<Statistics> {
     @Column
     commentCount: number;
 
-    @Column
+    @Column({ primaryKey: true })
     videoId: string;
+
+    @Column({ primaryKey: true })
+    createdAt: Date;
+
 }

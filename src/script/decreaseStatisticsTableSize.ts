@@ -24,7 +24,7 @@ function process(video: Video): Promise {
         where: {
             videoId: video.videoId
         },
-        order: ["id"]
+        order: ["createdAt"]
     })
     .then((statisticsList: Statistics[]) => {
 

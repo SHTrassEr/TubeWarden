@@ -53,7 +53,7 @@ export default class StatisticsGrabberService {
         return Statistics.findAll({
             where: { videoId: result.id },
             order: [
-                ["id", "DESC"]
+                ["createdAt", "DESC"]
             ],
             limit: reqiredItemCnt
         }).then(statisticsList => {
@@ -88,7 +88,7 @@ export default class StatisticsGrabberService {
             return Statistics.findAll({
                 where: { videoId: video.videoId },
                 order: [
-                    ["id", "DESC"]
+                    ["createdAt", "DESC"]
                 ],
                 limit: this.violationService.getRequredItemCnt()
             })
