@@ -36,7 +36,7 @@ function process(video: Video): Promise {
                 if(isStatisticsAtLine(s1, s2, st)) {
                     totalD++;
 
-                    // s2.destroy();
+                    s2.destroy();
 
                     s2 = st;
                     continue;
