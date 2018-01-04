@@ -5,6 +5,8 @@ import * as path from "path";
 import * as logger from "morgan";
 import * as cookieParser from  "cookie-parser";
 import * as bodyParser from "body-parser";
+import * as favicon from "serve-favicon";
+import * as compression from "compression";
 
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
@@ -25,8 +27,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
-
+app.use(favicon(__dirname + "/public/images/favicon.png"));
+app.use(compression());
 
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
