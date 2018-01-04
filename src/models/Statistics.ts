@@ -3,8 +3,7 @@ import {Table, Column,  Model, DataType} from "sequelize-typescript";
 
 @Table({
     tableName: "statistics",
-    timestamps: true,
-    indexes:[{ unique: false, fields:["videoId"]}]
+    timestamps: true
 })
 export default class Statistics extends Model<Statistics> {
 
