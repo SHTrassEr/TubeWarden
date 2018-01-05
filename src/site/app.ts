@@ -13,7 +13,10 @@ import * as indexController from "./controllers/index";
 import * as statisticsController from "./controllers/statistics";
 import * as allController from "./controllers/all";
 
+
 import Config from "../config";
+
+var opts: any = {};
 
 export const app: express.Application = express();
 
@@ -33,8 +36,9 @@ app.use(compression());
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
 app.get("/video/:videoId", statisticsController.getVideo);
-app.get("/api/videoList", apiController.getVideoList);
+app.get("/api/trendsVideoList", apiController.getVideoList);
 app.get("/api/statistics/:videoId", apiController.getStatisticsByVideo);
+
 
 
 // catch 404 and forward to error handler

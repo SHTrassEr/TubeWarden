@@ -1,14 +1,35 @@
 import sequelize from "../sequelize";
 import * as http from "http";
+import * as https from "https";
+import * as fs from "fs";
+import * as net from "net";
+
 import { app }  from "./app";
+import Config from "../config";
 
 
-var server: http.Server = http.createServer(app);
+var sslConf: any = null;
+
+if(Config.SSL.key && fs.existsSync(Config.SSL.key)) {
+    sslConf = {
+        key : fs.readFileSync(Config.SSL.key),
+        cert : fs.readFileSync(Config.SSL.cert),
+        ca : fs.readFileSync(Config.SSL.ca)
+    };
+}
 
 var port: number = app.get("port");
+var server: net.Server  = null;
 
 sequelize.sync()
 .then(() => {
+    if(sslConf) {
+        port = 443;
+        server = https.createServer(sslConf, app);
+    } else {
+        server = http.createServer(app);
+    }
+
     server.listen(port);
     server.on("error", onError);
     server.on("listening", onListening);

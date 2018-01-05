@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Op } from "sequelize";
 import Video from "../../models/db/Video";
 import Statistics from "../../models/db/Statistics";
 
@@ -22,3 +23,14 @@ export let getStatisticsByVideo: (req: Request, res: Response) => any = (req: Re
     });
 };
 
+export let getTrendsVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
+    Video.findAll({
+        limit: 100 ,
+        order: [
+            ["trendsAt", "DESC"]
+        ]
+    })
+    .then((videoList) => {
+        res.json(videoList);
+    });
+};
