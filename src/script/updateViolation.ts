@@ -2,8 +2,8 @@ import { Promise } from "bluebird";
 import ViolationService from "../grabber/service/violationService";
 
 import sequelize from "../sequelize";
-import Statistics  from "../models/Statistics";
-import Video   from "../models/Video";
+import Statistics  from "../models/db/Statistics";
+import Video   from "../models/db/Video";
 
 
 var violationService: ViolationService = new ViolationService();

@@ -4,7 +4,10 @@ import {Table, Column,  Model, DataType} from "sequelize-typescript";
 @Table( {
     tableName: "videos",
     timestamps: true,
-    indexes:[{ unique: false, fields:["nextStatisticsUpdateAt"]}]
+    indexes:[
+        { unique: false, fields:["nextStatisticsUpdateAt"] },
+        { unique: false, fields:["trendsAt"]}
+    ]
 })
 export default class Video extends Model<Video> {
 
@@ -31,4 +34,7 @@ export default class Video extends Model<Video> {
 
     @Column(DataType.DATE)
     nextStatisticsUpdateAt: Date;
+
+    @Column(DataType.DATE)
+    trendsAt: Date;
 }

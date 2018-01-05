@@ -1,5 +1,5 @@
-import Statistics  from "../../models/Statistics";
-import Video   from "../../models/Video";
+import Statistics  from "../../models/db/Statistics";
+import Video   from "../../models/db/Video";
 
 import GoogleVideoService from "../../google/googleVideoService";
 import ViolationService from "./violationService";
@@ -145,6 +145,11 @@ export default class StatisticsGrabberService {
                 (this.statisticsUpdateCfg.endAt - this.statisticsUpdateCfg.lowDealyAt));
             var delay: number =  (1- c) * this.statisticsUpdateCfg.delayMin + c * this.statisticsUpdateCfg.delayMax;
             return this.getDateAddMinutes(video.statisticsUpdatedAt, delay);
+        }
+
+        var diffTrends: number = this.getDateDiffMinutes(video.trendsAt, video.statisticsUpdatedAt);
+        if(diffTrends <= this.statisticsUpdateCfg.lowDealyAt) {
+            return this.getDateAddMinutes(video.statisticsUpdatedAt, this.statisticsUpdateCfg.delayMax);
         }
 
         return null;

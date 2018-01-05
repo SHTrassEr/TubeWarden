@@ -1,5 +1,5 @@
 import sequelize from "../sequelize";
-import Video from "../models/Video";
+import Video from "../models/db/Video";
 
 sequelize.sync()
     .then(() => {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Video from "../../models/Video";
+import Video from "../../models/db/Video";
 
 export let getVideo: (req: Request, res: Response) => any = (req: Request, res: Response) => {
     Video.findOne({

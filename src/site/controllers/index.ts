@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
-import Video from "../../models/Video";
+import Video from "../../models/db/Video";
 
 
 export let index:(req: Request, res: Response) => any  = (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ export let index:(req: Request, res: Response) => any  = (req: Request, res: Res
             }
         },
         order: [
-            ["lastViolationAt", "DESC"]
+            ["trendsAt", "DESC"]
         ],
         limit: 50
     })

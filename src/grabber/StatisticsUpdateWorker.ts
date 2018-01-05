@@ -1,5 +1,5 @@
 import { Promise } from "bluebird";
-import Video from "../models/Video";
+import Video from "../models/db/Video";
 import StatisticsGrabberService from "./service/statisticsGrabberService";
 import { Op } from "sequelize";
 

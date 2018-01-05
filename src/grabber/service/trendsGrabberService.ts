@@ -1,7 +1,7 @@
 import { Promise } from "bluebird";
 
 import  GoogleVideoService from "../../google/googleVideoService";
-import Video from "../../models/Video";
+import Video from "../../models/db/Video";
 
 export default class TrendsGrabberService {
 
@@ -42,6 +42,9 @@ export default class TrendsGrabberService {
             .then(v => {
                 if(!v) {
                     newVideoList.push(result.id);
+                } else {
+                    v.trendsAt = new Date();
+                    v.save();
                 }
             });
     }
@@ -50,11 +53,13 @@ export default class TrendsGrabberService {
         Video.findOne({where: {videoId: result.id}})
             .then(v => {
                 if(!v) {
+                    var date: Date = new Date();
                     return Video.create({
                         videoId: result.id,
                         title: result.snippet.title,
                         publishedAt: result.snippet.publishedAt,
-                        nextStatisticsUpdateAt: new Date()
+                        nextStatisticsUpdateAt: date,
+                        trendsAt: date
                     });
                 }
             });

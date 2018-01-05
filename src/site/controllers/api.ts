@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Video from "../../models/Video";
-import Statistics from "../../models/Statistics";
+import Video from "../../models/db/Video";
+import Statistics from "../../models/db/Statistics";
 
 
 export let getVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
