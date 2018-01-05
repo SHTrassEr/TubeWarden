@@ -24,6 +24,11 @@ var server: net.Server  = null;
 sequelize.sync()
 .then(() => {
     if(sslConf) {
+        http.createServer(function (req: any, res: any): void {
+            res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
+            res.end();
+        }).listen(port);
+
         port = 443;
         server = https.createServer(sslConf, app);
     } else {
