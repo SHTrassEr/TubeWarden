@@ -7,6 +7,7 @@ import * as cookieParser from  "cookie-parser";
 import * as bodyParser from "body-parser";
 import * as favicon from "serve-favicon";
 import * as compression from "compression";
+import * as cors from "cors";
 
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
@@ -36,8 +37,8 @@ app.use(compression());
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
 app.get("/video/:videoId", statisticsController.getVideo);
-app.get("/api/trendsVideoList", apiController.getVideoList);
-app.get("/api/statistics/:videoId", apiController.getStatisticsByVideo);
+app.get("/api/trendsVideoList", cors(), apiController.getVideoList);
+app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
 
 
 
