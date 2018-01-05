@@ -37,7 +37,7 @@ app.use(compression());
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
 app.get("/video/:videoId", statisticsController.getVideo);
-app.get("/api/trendsVideoList", cors(), apiController.getVideoList);
+app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
 
 
