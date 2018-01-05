@@ -25,7 +25,7 @@ export let getStatisticsByVideo: (req: Request, res: Response) => any = (req: Re
 
 export let getTrendsVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
     Video.findAll({
-        limit: 100 ,
+        limit: 200 ,
         order: [
             ["trendsAt", "DESC"]
         ]
