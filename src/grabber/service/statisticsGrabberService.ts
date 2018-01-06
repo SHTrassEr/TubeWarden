@@ -93,28 +93,34 @@ export default class StatisticsGrabberService {
                 limit: this.violationService.getRequredItemCnt()
             })
             .then(statisticsList => {
+                if(statisticsList && statisticsList.length > 0) {
+                    video.statisticsUpdatedAt = new Date();
 
-                video.statisticsUpdatedAt = new Date();
+                    var lastSt: Statistics = statisticsList[0];
 
-                statisticsList.reverse();
-                var violated: boolean = false;
+                    statisticsList.reverse();
+                    var violated: boolean = false;
 
-                if(this.violationService.check(statisticsList, "likeCount")) {
-                    video.likeViolationCnt ++;
-                    violated = true;
+                    if(this.violationService.check(statisticsList, "likeCount")) {
+                        video.likeViolationCnt ++;
+                        violated = true;
+                    }
+
+                    if(this.violationService.check(statisticsList, "dislikeCount")) {
+                        video.dislikeViolationCnt ++;
+                        violated = true;
+                    }
+
+                    if(violated) {
+                        video.lastViolationAt = new Date();
+                    }
+
+                    video.nextStatisticsUpdateAt = this.getNextUpdateTime(video);
+                    video.likeCount = lastSt.likeCount;
+                    video.dislikeCount = lastSt.dislikeCount;
+                    video.viewCount = lastSt.viewCount;
+                    return video.save();
                 }
-
-                if(this.violationService.check(statisticsList, "dislikeCount")) {
-                    video.dislikeViolationCnt ++;
-                    violated = true;
-                }
-
-                if(violated) {
-                    video.lastViolationAt = new Date();
-                }
-
-                video.nextStatisticsUpdateAt = this.getNextUpdateTime(video);
-                return video.save();
             });
         }
     }

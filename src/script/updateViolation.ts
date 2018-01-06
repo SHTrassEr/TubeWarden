@@ -23,8 +23,12 @@ function updateVideoViolation(video: Video): Promise {
 
         var lastViolationAt: Date = null;
 
+        var lastSt: Statistics;
+
 
         for(var statistics of statisticsList) {
+            lastSt = statistics;
+
             arr[0] = arr[1];
             arr[1] = arr[2];
             arr[2] = statistics;
@@ -42,14 +46,21 @@ function updateVideoViolation(video: Video): Promise {
             }
         }
 
-        return Video.update({
-            likeViolationCnt: likeViolationCnt,
-            dislikeViolationCnt:dislikeViolationCnt,
-            lastViolationAt: lastViolationAt
-            }, {
-                where: {videoId: video.videoId}
-            }
-        );
+        if(statistics) {
+
+            return Video.update({
+                likeViolationCnt: likeViolationCnt,
+                dislikeViolationCnt:dislikeViolationCnt,
+                lastViolationAt: lastViolationAt,
+                likeCount: lastSt.likeCount,
+                dislikeCount: lastSt.dislikeCount,
+                viewCount: lastSt.viewCount
+                }, {
+                    where: {videoId: video.videoId}
+                }
+            );
+        }
+
     });
 }
 

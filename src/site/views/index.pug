@@ -3,14 +3,14 @@ extends layout
 block content
   div
     h3 Подозрение на накрутку лайков
-    div.list-group
+    div.list-group.list-video-group
       each video in videoListLike
         include includes/item.pug
           
 
   div
     h3 Подозрение на накрутку дизлайков
-    div.list-group
+    div.list-group.list-video-group
       each video in videoListDislike
         include includes/item.pug
 

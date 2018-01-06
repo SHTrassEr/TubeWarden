@@ -1,8 +1,14 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding-top: 50px;
 }
 
-a {
-  color: #00B7FF;
+.list-video-group .list-video-item .list-video-item-info {
+  margin-bottom: 0;
+  font-size: 0.8em;
+  margin-top: 2px;
+}
+
+.list-video-group .list-video-item .video-title {
+  font-size: 1.1em;
+  color: #337ab7;
 }

@@ -21,6 +21,15 @@ export default class Video extends Model<Video> {
     publishedAt: Date;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
+    likeCount: number;
+
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    dislikeCount: number;
+
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    viewCount: number;
+
+    @Column({type: DataType.INTEGER, defaultValue: 0})
     likeViolationCnt: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})

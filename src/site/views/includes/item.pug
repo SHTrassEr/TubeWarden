@@ -1,1 +1,11 @@
-a.list-group-item(href='/video/' + video.videoId )= video.title
+a.list-group-item.list-video-item(href='/video/' + video.videoId )
+  span.video-title= video.title
+  ul.list-inline.list-video-item-info
+    li Просмотров: 
+      i= video.viewCount
+    li Лайков: 
+      i= video.likeCount
+    li Дизлайков: 
+      i= video.dislikeCount
+    li Обновлено: 
+      i.date-time-value(data-value=video.statisticsUpdatedAt)
