@@ -6,7 +6,7 @@ var minViolationValue: number = 200;
 var itemCnt: number = 3;
 
 var atLineEp: number = 0.000075;
-var maxLineMin: 30;
+var maxLineMin: 45;
 
 export default class ViolationService {
 
@@ -48,7 +48,7 @@ export default class ViolationService {
 
         var dx: number = (this.getX(stm) - this.getX(stl)) / 1000 / 60;
         if(dx > maxLineMin) {
-            dx = maxLineMin;
+            return false;
         }
 
         var y: number = ((this.getX(stm) - this.getX(stl))*(str[yf] - stl[yf])) / (this.getX(str) - this.getX(stl)) + stl[yf];
