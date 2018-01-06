@@ -8,7 +8,12 @@ body {
   margin-top: 2px;
 }
 
+.list-video-group .list-video-item .list-video-item-info .glyphicon {
+  padding-right: 2px;
+}
+
 .list-video-group .list-video-item .video-title {
   font-size: 1.1em;
   color: #337ab7;
 }
+

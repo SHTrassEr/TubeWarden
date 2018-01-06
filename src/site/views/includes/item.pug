@@ -1,11 +1,17 @@
 a.list-group-item.list-video-item(href='/video/' + video.videoId )
   span.video-title= video.title
   ul.list-inline.list-video-item-info
-    li Просмотров: 
-      i= video.viewCount
-    li Лайков: 
-      i= video.likeCount
-    li Дизлайков: 
-      i= video.dislikeCount
     li Обновлено: 
       i.date-time-value(data-value=video.statisticsUpdatedAt)
+    li
+      span.glyphicon.glyphicon-eye-open(aria-hidden="true")
+      i= video.viewCount
+    li
+      span.glyphicon.glyphicon-thumbs-up(aria-hidden="true")
+      i= video.likeCount
+    li
+      span.glyphicon.glyphicon-thumbs-down(aria-hidden="true")
+      i= video.dislikeCount
+
+
+      

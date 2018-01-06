@@ -29,6 +29,6 @@ export let index:(req: Request, res: Response) => any  = (req: Request, res: Res
             }
         }
 
-        res.render("index", { title: "TubeWarden", videoListLike: videoListLike, videoListDislike: videoListDislike });
+        res.render("index", { videoListLike: videoListLike, videoListDislike: videoListDislike });
     });
 };

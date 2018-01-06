@@ -13,6 +13,7 @@ import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
 import * as statisticsController from "./controllers/statistics";
 import * as allController from "./controllers/all";
+import * as aboutController from "./controllers/about";
 
 
 import Config from "../config";
@@ -36,6 +37,7 @@ app.use(compression());
 
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
+app.get("/about", aboutController.about);
 app.get("/video/:videoId", statisticsController.getVideo);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
