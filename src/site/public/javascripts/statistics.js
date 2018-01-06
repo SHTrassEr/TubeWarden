@@ -12,7 +12,7 @@ $(document).ready(function() {
                     borderColor: '#268808',
                     fill: false,
                     lineTension: 0,
-                    data: data.map((d) => {return {x: new Date (d.createdAt), y:d.likeCount } })
+                    data: data.map((d) => {return {x: new Date (d.updatedAt), y:d.likeCount } })
                 },
                 {
                     label: "Дизлайков",
@@ -20,7 +20,7 @@ $(document).ready(function() {
                     backgroundColor: '#de1616',
                     borderColor: '#de1616',
                     lineTension: 0,
-                    data: data.map((d) => {return {x: new Date (d.createdAt), y:d.dislikeCount } })
+                    data: data.map((d) => {return {x: new Date (d.updatedAt), y:d.dislikeCount } })
                 }]
             },
             options: {
@@ -55,7 +55,7 @@ $(document).ready(function() {
                     backgroundColor: '#1664de',
                     borderColor: '#1664de',
                     lineTension: 0,
-                    data: data.map((d) => {return {x: new Date (d.createdAt), y:d.viewCount } })
+                    data: data.map((d) => {return {x: new Date (d.updatedAt), y:d.viewCount } })
                 }]
             },
             options: {
