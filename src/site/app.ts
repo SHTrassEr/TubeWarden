@@ -8,6 +8,7 @@ import * as bodyParser from "body-parser";
 import * as favicon from "serve-favicon";
 import * as compression from "compression";
 import * as cors from "cors";
+import * as apicache from "apicache";
 
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
@@ -22,18 +23,21 @@ var opts: any = {};
 
 export const app: express.Application = express();
 
+let cache: any = apicache.middleware;
+
 app.set("port", Config.Server.port);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
 app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(bodyParser.json());
+//  app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(favicon(__dirname + "/public/images/favicon.png"));
 app.use(compression());
+app.use(cache("2 minutes"));
 
 app.get("/", indexController.index);
 app.get("/all", allController.getAllVideo);
