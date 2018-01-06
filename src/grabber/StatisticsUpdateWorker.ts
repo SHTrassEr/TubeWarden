@@ -18,6 +18,7 @@ export default class StatisticsUpdateWorker {
         return Video.findAll({
             limit: this.maxResults,
             where:{
+                deleted: false,
                 nextStatisticsUpdateAt: {
                     [Op.lt]: new Date()
                 }

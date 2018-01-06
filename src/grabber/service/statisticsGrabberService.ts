@@ -20,10 +20,26 @@ export default class StatisticsGrabberService {
         this.statisticsUpdateCfg = statisticsUpdateCfg;
     }
 
+    processInvalidVideo(videoIdList: string[], data: any[]): Promise {
+
+        if(data && videoIdList.length > data.length) {
+            var idList: string[]= videoIdList.filter((videoId) => {
+                return !(data.find((d) => d.id === videoId));
+            });
+            if(idList.length > 0) {
+                return Video.update({ deleted: true, deletedAt: new Date() }, { where: { videoId: idList }});
+            }
+        }
+    }
+
     update(videoIdList: string[]): Promise {
+
         return this.googleVideoService.getStatistics(this.auth, videoIdList)
         .then((data) => {
-            return Promise.each(data.items, this.updateStatistics.bind(this));
+            if(data && data.items) {
+                return Promise.each(data.items, this.updateStatistics.bind(this))
+                    .then(() => this.processInvalidVideo(videoIdList, data.items));
+            }
         });
     }
 

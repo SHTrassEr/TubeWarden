@@ -5,7 +5,7 @@ import {Table, Column,  Model, DataType} from "sequelize-typescript";
     tableName: "videos",
     timestamps: true,
     indexes:[
-        { unique: false, fields:["nextStatisticsUpdateAt"] },
+        { unique: false, fields:["deleted", "nextStatisticsUpdateAt"] },
         { unique: false, fields:["trendsAt"]}
     ]
 })
@@ -34,6 +34,12 @@ export default class Video extends Model<Video> {
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
     dislikeViolationCnt: number;
+
+    @Column({ defaultValue: false })
+    deleted: boolean;
+
+    @Column(DataType.DATE)
+    deletedAt: Date;
 
     @Column(DataType.DATE)
     lastViolationAt: Date;
