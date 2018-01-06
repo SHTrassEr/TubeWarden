@@ -6,7 +6,7 @@ var minViolationValue: number = 200;
 var itemCnt: number = 3;
 
 var atLineEp: number = 0.000075;
-var maxLineMin: 60;
+var maxLineMin: 30;
 
 export default class ViolationService {
 
