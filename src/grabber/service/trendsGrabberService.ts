@@ -44,7 +44,9 @@ export default class TrendsGrabberService {
                     newVideoList.push(result.id);
                 } else {
                     v.trendsAt = new Date();
-                    v.save();
+                    v.deleted = false;
+                    v.deletedAt = null;
+                    return v.save();
                 }
             });
     }
