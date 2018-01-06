@@ -1,9 +1,7 @@
 extends layout
 
 block content
-  h1= title
   p Все видео
-    ul
+    div.list-group
       each video in videoList
-        li
-          a(href='/video/' + video.videoId )= video.title
+          include includes/item.pug

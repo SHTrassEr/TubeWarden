@@ -1,12 +1,36 @@
 doctype html
 html
   head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
-    
+    link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+
+    script()
     block head
   body
-    block content
 
+    nav.navbar.navbar-inverse.navbar-fixed-top
+      div.container
+        div.navbar-header
+          button(type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar")
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href="/") TubeWarden
+        div#navbar.collapse.navbar-collapse
+          ul.nav.navbar-nav
+            li
+              a(href="/") О проекте
+            li
+              a(href="https://github.com/SHTrassEr/TubeWarden") GitHub
+
+    div.container
+      block content
+
+  script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+  script(src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js")
   block script
