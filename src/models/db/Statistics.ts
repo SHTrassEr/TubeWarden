@@ -10,13 +10,13 @@ export default class Statistics extends Model<Statistics> {
     @Column
     viewCount: number;
 
-    @Column
+    @Column({allowNull: true})
     likeCount: number;
 
-    @Column
+    @Column({allowNull: true})
     dislikeCount: number;
 
-    @Column
+    @Column({allowNull: true})
     commentCount: number;
 
     @Column({ primaryKey: true })

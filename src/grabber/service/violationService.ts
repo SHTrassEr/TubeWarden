@@ -6,7 +6,7 @@ var minViolationValue: number = 200;
 var itemCnt: number = 3;
 
 var atLineEp: number = 0.000075;
-var maxLineMin: 45;
+var maxLineMin: number = 45;
 
 export default class ViolationService {
 
@@ -20,6 +20,19 @@ export default class ViolationService {
 
     check(arr: Statistics[], yf: string): boolean {
         if(arr.length === itemCnt && this.getX(arr[2]) !== this.getX(arr[1]) && this.getX(arr[1]) !== this.getX(arr[0])) {
+
+            var stl: Statistics = arr[0];
+            var stm: Statistics = arr[1];
+            var str: Statistics = arr[2];
+
+            if(stl[yf] === stm[yf] && stm[yf] === str[yf]) {
+                return false;
+            }
+
+            if(!stl[yf] || !stm[yf] || !str[yf]) {
+                return false;
+            }
+
             var dx: number = (this.getX(arr[2]) - this.getX(arr[1])) / 1000 / 60;
             var y: number = (this.getX(arr[2]) - this.getX(arr[0])) *
                 (arr[1][yf] - arr[0][yf]) / (this.getX(arr[1]) - this.getX(arr[0])) + arr[0][yf];
@@ -45,6 +58,14 @@ export default class ViolationService {
         var stl: Statistics = arr[0];
         var stm: Statistics = arr[1];
         var str: Statistics = arr[2];
+
+        if(stl[yf] === stm[yf] && stm[yf] === str[yf]) {
+            return true;
+        }
+
+        if(!stl[yf] || !stm[yf] || !str[yf]) {
+            return false;
+        }
 
         var dx: number = (this.getX(stm) - this.getX(stl)) / 1000 / 60;
         if(dx > maxLineMin) {
