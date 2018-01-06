@@ -11,7 +11,7 @@ export let index:(req: Request, res: Response) => any  = (req: Request, res: Res
             }
         },
         order: [
-            ["trendsAt", "DESC"]
+            ["lastViolationAt", "DESC"]
         ],
         limit: 50
     })

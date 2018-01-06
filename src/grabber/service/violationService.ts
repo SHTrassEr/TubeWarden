@@ -1,6 +1,6 @@
 import Statistics  from "../../models/db/Statistics";
 
-var violationFactor: number = 0.05;
+var violationFactor: number = 0.015;
 var minViolationValue: number = 200;
 
 var itemCnt: number = 3;
@@ -37,7 +37,7 @@ export default class ViolationService {
             var y: number = (this.getX(arr[2]) - this.getX(arr[0])) *
                 (arr[1][yf] - arr[0][yf]) / (this.getX(arr[1]) - this.getX(arr[0])) + arr[0][yf];
 
-            var e: number = arr[0][yf] * violationFactor;
+            var e: number = arr[1][yf] * violationFactor;
             if(e < minViolationValue) {
                 e = minViolationValue;
             }
