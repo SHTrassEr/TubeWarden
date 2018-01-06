@@ -26,6 +26,9 @@ $(document).ready(function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 0
+                },
                 elements: {
                     point: { 
                         radius: 2 ,
@@ -64,6 +67,9 @@ $(document).ready(function() {
                         hitRadius: 3, 
                         hoverRadius: 3
                     }
+                },
+                animation: {
+                    duration: 0
                 },
                 scales: {
 					xAxes: [{
