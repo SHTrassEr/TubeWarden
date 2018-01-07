@@ -41,8 +41,8 @@ export default class Config {
 
     public static SSL = {
         key: __dirname + "/../../cert/TubeWarden/private.key",
-        cert: __dirname + "/../ssl/certificate.crt",
-        ca: __dirname + "/../ssl/ca_bundle.pem",
+        cert: __dirname + "/../../cert/certificate.crt",
+        ca: __dirname + "/../../cert/ca_bundle.pem",
     };
 
     public static Google = {
