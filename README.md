@@ -6,7 +6,10 @@
     git clone https://github.com/SHTrassEr/TubeWarden.git
 ```
 * Установить NodeJS 8.9.3+,  MySql
-* Создать пустую базу данных в MySql
+* Создать пустую базу данных в MySql, при этом нужно указать:
+```
+    DEFAULT CHARACTER SET utf8mb4 
+```
 * Скопировать файл `src/config.example.ts` в `src/config.ts`
 * В файле `config.ts` указать параметры подключения к БД, а так же ключ гугла. Инструкция по получению ключа гугла: https://developers.google.com/youtube/v3/getting-started  
 * Выполнить команды
