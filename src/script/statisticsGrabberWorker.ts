@@ -1,6 +1,7 @@
 import sequelize from "../sequelize";
 import * as schedule from "node-schedule";
 import Config from "../config";
+import { Promise } from "bluebird";
 import StatisticsUpdateWorker from "../grabber/StatisticsUpdateWorker";
 
 var statisticsUpdateWorker: StatisticsUpdateWorker
@@ -15,8 +16,10 @@ sequelize.authenticate()
                 statisticsUpdateWorker.process()
                     .then(() => {
                         isJobActive = false;
+                    })
+                    .error(() => {
+                        isJobActive = false;
                     });
             }
-
         });
     });

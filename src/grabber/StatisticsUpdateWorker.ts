@@ -29,5 +29,6 @@ export default class StatisticsUpdateWorker {
                 return this.statisticsGrabberService.update(idList);
             }
         });
+
     }
 }
