@@ -1,6 +1,6 @@
 function initDateTimeValue() {
     var elList = document.getElementsByClassName("date-time-value");
-    elList[0].getAttribute
+    
     for(var i = 0; i < elList.length; i++) {
         var el = elList[i];
         var date = new Date(el.getAttribute("data-value"));

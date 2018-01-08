@@ -8,6 +8,7 @@ $(document).ready(function() {
             duration: 0
         },
         tooltips: {
+            mode: 'label',
             callbacks: {
                 title: function(tooltipItem, data) {
                     return moment(tooltipItem[0].xLabel).format("DD-MM-YYYY HH:mm");
