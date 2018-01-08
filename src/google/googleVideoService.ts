@@ -1,9 +1,6 @@
 import { Promise } from "bluebird";
 import * as google from "googleapis";
 
-/*import { google } from "googleapis";
-var service = google.youtube("v3");*/
-
 var service: any = google.youtube("v3");
 
 export default class GoogleVideoService {
