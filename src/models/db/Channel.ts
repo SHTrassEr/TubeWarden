@@ -1,33 +1,32 @@
-import {Table, Column,  Model, DataType} from "sequelize-typescript";
-
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({
     tableName: "channels",
-    timestamps: true
+    timestamps: true,
 })
 export default class Channel extends Model<Channel> {
 
     @Column({ primaryKey: true })
-    Id: string;
+    public Id: string;
 
     @Column
-    title: string;
+    public title: string;
 
     @Column
-    videoCount: number;
+    public videoCount: number;
 
     @Column
-    subscriberCount: number;
+    public subscriberCount: number;
 
     @Column
-    trendsVideoCount: number;
+    public trendsVideoCount: number;
 
     @Column
-    statisticsVideoCount: number;
+    public statisticsVideoCount: number;
 
     @Column
-    likeViolationCount: number;
+    public likeViolationCount: number;
 
     @Column
-    dislikeViolationCount: number;
+    public dislikeViolationCount: number;
 }

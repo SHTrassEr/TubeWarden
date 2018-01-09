@@ -1,55 +1,57 @@
-import {Table, Column,  Model, DataType} from "sequelize-typescript";
-
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table( {
     tableName: "videos",
     timestamps: true,
-    indexes:[
-        { unique: false, fields:["deleted", "nextStatisticsUpdateAt"] },
-        { unique: false, fields:["trendsAt"]}
-    ]
+    indexes: [
+        { unique: false, fields: ["deleted", "nextStatisticsUpdateAt"] },
+        { unique: false, fields: ["trendsAt"] },
+    ],
 })
 export default class Video extends Model<Video> {
 
     @Column({ primaryKey: true })
-    videoId: string;
+    public videoId: string;
 
     @Column(DataType.TEXT)
-    title: string;
+    public title: string;
 
     @Column(DataType.DATE)
-    publishedAt: Date;
+    public publishedAt: Date;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    likeCount: number;
+    public likeCount: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    dislikeCount: number;
+    public dislikeCount: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    viewCount: number;
+    public viewCount: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    likeViolationCnt: number;
+    public likeViolationCnt: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    dislikeViolationCnt: number;
+    public dislikeViolationCnt: number;
 
     @Column({ defaultValue: false })
-    deleted: boolean;
+    public deleted: boolean;
 
     @Column(DataType.DATE)
-    deletedAt: Date;
+    public deletedAt: Date;
 
     @Column(DataType.DATE)
-    lastViolationAt: Date;
+    public lastViolationAt: Date;
 
     @Column(DataType.DATE)
-    statisticsUpdatedAt: Date;
+    public statisticsUpdatedAt: Date;
 
     @Column(DataType.DATE)
-    nextStatisticsUpdateAt: Date;
+    public nextStatisticsUpdateAt: Date;
 
     @Column(DataType.DATE)
-    trendsAt: Date;
+    public trendsAt: Date;
+
+    @Column
+    public channelId: string;
 }

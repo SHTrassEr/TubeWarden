@@ -1,29 +1,28 @@
 import * as express from "express";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
-import * as path from "path";
-import * as logger from "morgan";
-import * as cookieParser from  "cookie-parser";
-import * as bodyParser from "body-parser";
-import * as favicon from "serve-favicon";
-import * as compression from "compression";
-import * as cors from "cors";
 import * as apicache from "apicache";
+import * as bodyParser from "body-parser";
+import * as compression from "compression";
+import * as cookieParser from "cookie-parser";
+import * as cors from "cors";
+import * as logger from "morgan";
+import * as path from "path";
+import * as favicon from "serve-favicon";
 
+import * as aboutController from "./controllers/about";
+import * as allController from "./controllers/all";
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
 import * as statisticsController from "./controllers/statistics";
-import * as allController from "./controllers/all";
-import * as aboutController from "./controllers/about";
-
 
 import Config from "../config";
 
-var opts: any = {};
+// var opts: any = {};
 
 export const app: express.Application = express();
 
-let cache: any = apicache.middleware;
+const cache: any = apicache.middleware;
 
 app.set("port", Config.Server.port);
 
@@ -45,8 +44,6 @@ app.get("/about", aboutController.about);
 app.get("/video/:videoId", statisticsController.getVideo);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
-
-
 
 // catch 404 and forward to error handler
 /*app.use((req: Request, res: Response, next: NextFunction) => {

@@ -1,31 +1,30 @@
-import sequelize from "../sequelize";
+import * as fs from "fs";
 import * as http from "http";
 import * as https from "https";
-import * as fs from "fs";
 import * as net from "net";
+import sequelize from "../sequelize";
 
-import { app }  from "./app";
 import Config from "../config";
+import { app } from "./app";
 
+let sslConf: any = null;
 
-var sslConf: any = null;
-
-if(Config.SSL.key && fs.existsSync(Config.SSL.key)) {
+if (Config.SSL.key && fs.existsSync(Config.SSL.key)) {
     sslConf = {
         key : fs.readFileSync(Config.SSL.key),
         cert : fs.readFileSync(Config.SSL.cert),
-        ca : fs.readFileSync(Config.SSL.ca)
+        ca : fs.readFileSync(Config.SSL.ca),
     };
 }
 
-var port: number = app.get("port");
-var server: net.Server  = null;
+let port: number = app.get("port");
+let server: net.Server  = null;
 
 sequelize.sync()
 .then(() => {
-    if(sslConf) {
-        http.createServer(function (req: any, res: any): void {
-            res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
+    if (sslConf) {
+        http.createServer((req: any, res: any) => {
+            res.writeHead(301, { Location: "https://" + req.headers.host + req.url });
             res.end();
         }).listen(port);
 
@@ -40,11 +39,9 @@ sequelize.sync()
     server.on("listening", onListening);
 });
 
-
-
 function onListening(): void {
-    var addr: any = server.address();
-    var bind: string = (typeof addr === "string")
+    const addr: any = server.address();
+    const bind: string = (typeof addr === "string")
       ? "pipe " + addr
       : "port " + addr.port;
     console.log("Listening on " + bind);

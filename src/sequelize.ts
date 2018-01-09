@@ -1,6 +1,6 @@
-import Config from "./config";
 import { Sequelize } from "sequelize-typescript";
+import Config from "./config";
 
-var sequelize: Sequelize = new Sequelize(Config.Database);
+const sequelize: Sequelize = new Sequelize(Config.Database);
 sequelize.addModels([__dirname + "/models/db"]);
 export default sequelize;

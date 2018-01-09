@@ -1,14 +1,14 @@
-import { Promise } from "bluebird";
+import { GoogleVideoInfo } from "../../models/google/ItemInfo";
 
-import  GoogleVideoService from "../../google/googleVideoService";
+import GoogleVideoService from "../../google/googleVideoService";
 import Video from "../../models/db/Video";
 
 export default class TrendsGrabberService {
 
-    googleVideoService = new GoogleVideoService();
-    auth;
-    regionCode: string;
-    maxResults: number;
+    protected googleVideoService = new GoogleVideoService();
+    protected auth;
+    protected regionCode: string;
+    protected maxResults: number;
 
     constructor(auth: any, regionCode: string, maxResults: number) {
         this.auth = auth;
@@ -16,54 +16,44 @@ export default class TrendsGrabberService {
         this.maxResults = maxResults;
     }
 
-
-    update(): Promise {
-        return this.googleVideoService.getMostPopular(this.auth, this.regionCode, this.maxResults)
-            .then((data) => {
-                var newVideoList: string[] = [];
-                Promise.each(data.items, r => this.checkVideo(r, newVideoList))
-                    .then(() => {
-                        if(newVideoList.length > 0) {
-                            return this.updateVideoList(newVideoList);
-                        }
-                    });
-            });
+    public async update(): Promise<any> {
+        const trendsIdList = await this.googleVideoService.getMostPopularVideoIdList(this.auth, this.regionCode, this.maxResults);
+        if (trendsIdList && trendsIdList.length > 0) {
+            const videoList = await Video.findAll({where: { videoId: trendsIdList }});
+            const videoIdList = videoList.map((v) => v.videoId);
+            await this.updateVideoList(videoIdList);
+            const videoIdSet = new Set<string>(videoIdList);
+            const newVideoIdList = trendsIdList.filter((videoId) => !videoIdSet.has(videoId));
+            await this.createVideoList(newVideoIdList);
+        }
     }
 
-    updateVideoList(videoList: string[]): Promise {
-        return this.googleVideoService.getInfo(this.auth, videoList)
-            .then((data) => {
-                return Promise.each(data.items, r => this.updateVideo(r));
-            });
+    protected async createVideoList(newVideoIdList: string[]): Promise<any> {
+        if (newVideoIdList.length > 0) {
+            const videoInfoList = await this.googleVideoService.getInfo(this.auth, newVideoIdList);
+
+            for (const videoInfo of videoInfoList) {
+                const newVideo  = this.createVideo(videoInfo);
+                await newVideo.save();
+            }
+        }
     }
 
-    checkVideo(result: any, newVideoList: string[]): Promise {
-        return Video.findOne({where: {videoId: result.id}})
-            .then(v => {
-                if(!v) {
-                    newVideoList.push(result.id);
-                } else {
-                    v.trendsAt = new Date();
-                    v.deleted = false;
-                    v.deletedAt = null;
-                    return v.save();
-                }
-            });
+    protected async updateVideoList(videoIdList: string[]): Promise<any> {
+        return Video.update({
+            trendsAt: new Date(),
+            deleted: false,
+            deletedAt: null,
+        }, { where: { videoId: videoIdList }});
     }
 
-    updateVideo(result: any):Promise {
-        Video.findOne({where: {videoId: result.id}})
-            .then(v => {
-                if(!v) {
-                    var date: Date = new Date();
-                    return Video.create({
-                        videoId: result.id,
-                        title: result.snippet.title,
-                        publishedAt: result.snippet.publishedAt,
-                        nextStatisticsUpdateAt: date,
-                        trendsAt: date
-                    });
-                }
-            });
+    protected createVideo(googleVideoInfo: GoogleVideoInfo): Video {
+        const video = new Video();
+        video.videoId = googleVideoInfo.id;
+        video.title = googleVideoInfo.snippet.title;
+        video.publishedAt = googleVideoInfo.snippet.publishedAt;
+        video.channelId = googleVideoInfo.snippet.channelId;
+        video.nextStatisticsUpdateAt = new Date();
+        return video;
     }
 }

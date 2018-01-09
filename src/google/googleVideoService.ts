@@ -1,58 +1,71 @@
-import { Promise } from "bluebird";
 import * as google from "googleapis";
 
-var service: any = google.youtube("v3");
+import { GoogleResultItemList, GoogleVideoInfo } from "../models/google/ItemInfo";
+
+const service: any = google.youtube("v3");
 
 export default class GoogleVideoService {
 
-    public getStatistics(auth: any, videoIdList: string[]): Promise {
+    public getStatistics(auth: any, videoIdList: string[]): Promise<GoogleVideoInfo[]> {
         return new Promise((resolve, reject) => {
             service.videos.list({
-                auth: auth,
+                auth,
                 part: "statistics",
                 id: videoIdList.join(),
-                fields: "items(id,statistics)"
+                fields: "items(id,statistics)",
             }, (err, data) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(data);
+                    if (data.items) {
+                        resolve(data.items);
+                    } else {
+                        resolve([]);
+                    }
                 }
             });
         });
     }
 
-    public getInfo(auth: any, videoIdList: string[]): Promise {
+    public getInfo(auth: any, videoIdList: string[]): Promise<GoogleVideoInfo[]> {
         return new Promise((resolve, reject) => {
             service.videos.list({
-                auth: auth,
+                auth,
                 part: "snippet",
                 id: videoIdList.join(),
-                fields: "items(id,snippet(publishedAt,title))"
+                fields: "items(id,snippet(channelId,publishedAt,title))",
             }, (err, data) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(data);
+                    if (data.items) {
+                        resolve(data.items);
+                    } else {
+                        resolve([]);
+                    }
                 }
             });
         });
     }
 
-    public getMostPopular(auth: any, regionCode: string, maxResults: number): Promise {
+    public getMostPopularVideoIdList(auth: any, regionCode: string, maxResults: number): Promise<string[]> {
         return new Promise((resolve, reject) => {
             service.videos.list({
-                auth: auth,
+                auth,
+                regionCode,
+                maxResults,
                 part: "snippet",
-                regionCode: regionCode,
-                maxResults: maxResults,
                 chart: "mostPopular",
-                fields: "items(id)"
+                fields: "items(id)",
             }, (err, data) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(data);
+                    if (data.items) {
+                        resolve(data.items.map((d) => d.id ));
+                    } else {
+                        resolve([]);
+                    }
                 }
             });
         });

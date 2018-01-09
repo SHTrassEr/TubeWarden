@@ -1,28 +1,27 @@
-import {Table, Column,  Model, DataType} from "sequelize-typescript";
-
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({
     tableName: "statistics",
-    timestamps: true
+    timestamps: true,
 })
 export default class Statistics extends Model<Statistics> {
 
     @Column
-    viewCount: number;
+    public  viewCount: number;
 
     @Column({allowNull: true})
-    likeCount: number;
+    public likeCount: number;
 
     @Column({allowNull: true})
-    dislikeCount: number;
+    public dislikeCount: number;
 
     @Column({allowNull: true})
-    commentCount: number;
+    public commentCount: number;
 
     @Column({ primaryKey: true })
-    videoId: string;
+    public videoId: string;
 
     @Column({ primaryKey: true })
-    createdAt: Date;
+    public createdAt: Date;
 
 }

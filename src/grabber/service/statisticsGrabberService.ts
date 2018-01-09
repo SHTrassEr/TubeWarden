@@ -1,176 +1,153 @@
-import Statistics  from "../../models/db/Statistics";
-import Video   from "../../models/db/Video";
+import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/ItemInfo";
+
+import Statistics from "../../models/db/Statistics";
+import Video from "../../models/db/Video";
 
 import GoogleVideoService from "../../google/googleVideoService";
 import ViolationService from "./violationService";
 
-
-
-import { Promise } from "bluebird";
-
 export default class StatisticsGrabberService {
 
-    googleVideoService = new GoogleVideoService();
-    violationService = new ViolationService();
-    auth;
-    statisticsUpdateCfg;
+    protected googleVideoService = new GoogleVideoService();
+    protected violationService = new ViolationService();
+    protected auth;
+    protected statisticsUpdateCfg;
 
     constructor(auth: any, statisticsUpdateCfg: any) {
         this.auth = auth;
         this.statisticsUpdateCfg = statisticsUpdateCfg;
     }
 
-    processInvalidVideo(videoIdList: string[], data: any[]): Promise {
+    public async update(videoIdList: string[]): Promise<any> {
+        const statisticsInfoList = await this.googleVideoService.getStatistics(this.auth, videoIdList);
+        const statisticsInfoHash = this.createStatisticsInfoHash(statisticsInfoList);
+        const videoList = await Video.findAll({where: { videoId: Array.from(statisticsInfoHash.keys())}});
+        for (const video of videoList) {
+            await this.saveStatistics(video, statisticsInfoHash.get(video.videoId));
+        }
 
-        if(data && videoIdList.length > data.length) {
-            var idList: string[]= videoIdList.filter((videoId) => {
-                return !(data.find((d) => d.id === videoId));
-            });
-            if(idList.length > 0) {
-                return Video.update({ deleted: true, deletedAt: new Date() }, { where: { videoId: idList }});
-            }
+        const deletedVideoIdList = videoIdList.filter((videoId) => !statisticsInfoHash.has(videoId));
+        await this.updateDeletedVideoList(deletedVideoIdList);
+    }
+
+    protected async updateDeletedVideoList(deletedVideoIdList: string[]) {
+        if (deletedVideoIdList.length > 0) {
+            return Video.update({ deleted: true, deletedAt: new Date() }, {where: {videoId: deletedVideoIdList}});
         }
     }
 
-    update(videoIdList: string[]): Promise {
+    protected async saveStatistics(video: Video, statisticsInfo: GoogleVideoStatistics): Promise<any>  {
+        const statistics = this.createStatistics(video.videoId, statisticsInfo);
+        const reqiredItemCnt = this.violationService.getRequredItemCnt();
+        const statisticsList = await this.getLastStatistics(video.videoId, reqiredItemCnt);
 
-        return this.googleVideoService.getStatistics(this.auth, videoIdList)
-        .then((data) => {
-            if(data && data.items) {
-                return Promise.each(data.items, this.updateStatistics.bind(this))
-                    .then(() => this.processInvalidVideo(videoIdList, data.items));
+        if (this.violationService.isStatisticsAtLine(statistics, statisticsList)) {
+            const lastStatistics = statisticsList[statisticsList.length - 1];
+            this.initStatistics(lastStatistics, statisticsInfo);
+            await lastStatistics.save();
+        } else {
+            await statistics.save();
+            statisticsList.push(statistics);
+        }
+
+        return this.updateVideo(video, statisticsList);
+    }
+
+    protected async updateVideo(video: Video, statisticsList: Statistics[]): Promise<any> {
+        if (statisticsList && statisticsList.length > 0) {
+            video.statisticsUpdatedAt = new Date();
+
+            const lastSt: Statistics = statisticsList[statisticsList.length - 1];
+
+            let violated: boolean = false;
+
+            if (this.violationService.check(statisticsList, "likeCount")) {
+                video.likeViolationCnt ++;
+                violated = true;
             }
-        });
+
+            if (this.violationService.check(statisticsList, "dislikeCount")) {
+                video.dislikeViolationCnt ++;
+                violated = true;
+            }
+
+            if (violated) {
+                video.lastViolationAt = new Date();
+            }
+
+            video.nextStatisticsUpdateAt = this.getNextUpdateTime(video);
+            video.likeCount = lastSt.likeCount;
+            video.dislikeCount = lastSt.dislikeCount;
+            video.viewCount = lastSt.viewCount;
+            return video.save();
+        }
     }
 
-    createStatisticsByResult(result: any): any {
-        let date: Date = new Date();
-        return {
-            videoId: result.id,
-            viewCount: result.statistics.viewCount,
-            likeCount: result.statistics.likeCount,
-            dislikeCount: result.statistics.dislikeCount,
-            commentCount: result.statistics.commentCount,
-            createdAt: date,
-            updatedAt: date,
-        };
-    }
-
-    isStatisticsAtLine(statisticsList: Statistics[]): boolean {
-        return this.violationService.isStatisticsAtLine(statisticsList, "likeCount")
-            && this.violationService.isStatisticsAtLine(statisticsList, "dislikeCount")
-            && this.violationService.isStatisticsAtLine(statisticsList, "viewCount", 1);
-    }
-
-    updateStatistics(result: any): Promise {
-
-        var reqiredItemCnt: number = this.violationService.getRequredItemCnt() - 1;
-
-        return Statistics.findAll({
-            where: { videoId: result.id },
+    protected async getLastStatistics(videoId: string, itemCount: number): Promise<Statistics[]> {
+        const statisticsList = await Statistics.findAll({
+            where: { videoId },
             order: [
-                ["createdAt", "DESC"]
+                ["createdAt", "DESC"],
             ],
-            limit: reqiredItemCnt
-        }).then(statisticsList => {
-            var stl: any = this.createStatisticsByResult(result);
-
-            if(statisticsList.length === reqiredItemCnt) {
-                var stm: Statistics = statisticsList[0];
-                statisticsList.reverse();
-                statisticsList.push(stl);
-                if (this.isStatisticsAtLine(statisticsList)) {
-                    return stm.update(stl);
-                }
-            }
-
-            return Statistics.create(stl);
-        }).then(() => {
-            return this.updateVideoById(result.id);
+            limit: itemCount,
         });
+
+        statisticsList.reverse();
+        return statisticsList;
     }
 
-    updateVideoById(videoId: string): Promise {
-        return Video.findOne({
-            where: {
-                videoId: videoId
-            }
-        })
-        .then(video => this.updateVideo(video));
+    protected createStatisticsInfoHash(infoList: GoogleVideoInfo[]): Map<string, GoogleVideoStatistics> {
+        return infoList.reduce((map, obj) => {
+            return map.set(obj.id, obj.statistics);
+        }, new Map<string, GoogleVideoStatistics>());
     }
 
-    updateVideo(video: Video): any {
-        if (video != null) {
-            return Statistics.findAll({
-                where: { videoId: video.videoId },
-                order: [
-                    ["createdAt", "DESC"]
-                ],
-                limit: this.violationService.getRequredItemCnt()
-            })
-            .then(statisticsList => {
-                if(statisticsList && statisticsList.length > 0) {
-                    video.statisticsUpdatedAt = new Date();
-
-                    var lastSt: Statistics = statisticsList[0];
-
-                    statisticsList.reverse();
-                    var violated: boolean = false;
-
-                    if(this.violationService.check(statisticsList, "likeCount")) {
-                        video.likeViolationCnt ++;
-                        violated = true;
-                    }
-
-                    if(this.violationService.check(statisticsList, "dislikeCount")) {
-                        video.dislikeViolationCnt ++;
-                        violated = true;
-                    }
-
-                    if(violated) {
-                        video.lastViolationAt = new Date();
-                    }
-
-                    video.nextStatisticsUpdateAt = this.getNextUpdateTime(video);
-                    video.likeCount = lastSt.likeCount;
-                    video.dislikeCount = lastSt.dislikeCount;
-                    video.viewCount = lastSt.viewCount;
-                    return video.save();
-                }
-            });
-        }
+    protected createStatistics(videoId: string, statisticsInfo: GoogleVideoStatistics): Statistics {
+        const date = new Date();
+        const statistics = new Statistics();
+        statistics.videoId = videoId;
+        statistics.createdAt = date;
+        statistics.updatedAt = date;
+        this.initStatistics(statistics, statisticsInfo);
+        return statistics;
     }
 
-    getDateDiffMinutes(dateStart: Date, dateEnd: Date): number {
+    protected initStatistics(statistics: Statistics, statisticsInfo: GoogleVideoStatistics): void {
+        statistics.viewCount = statisticsInfo.viewCount;
+        statistics.likeCount = statisticsInfo.likeCount;
+        statistics.dislikeCount = statisticsInfo.dislikeCount;
+        statistics.commentCount = statisticsInfo.commentCount;
+    }
+
+    protected getDateDiffMinutes(dateStart: Date, dateEnd: Date): number {
         return (dateEnd.getTime() - dateStart.getTime()) / (1000 * 60);
     }
 
-    getDateAddMinutes(date: Date, min: number): Date {
+    protected getDateAddMinutes(date: Date, min: number): Date {
         return new Date(date.getTime() + min * 60 * 1000);
     }
 
-
-    getNextUpdateTime(video: Video): Date {
-        var lastViolationAt: Date = video.createdAt;
-        if(video.lastViolationAt) {
+    protected getNextUpdateTime(video: Video): Date {
+        let lastViolationAt: Date = video.createdAt;
+        if (video.lastViolationAt) {
             lastViolationAt = video.lastViolationAt;
         }
 
-        var diff: number = this.getDateDiffMinutes(lastViolationAt, video.statisticsUpdatedAt);
+        const diff = this.getDateDiffMinutes(lastViolationAt, video.statisticsUpdatedAt);
 
-        if(diff <= this.statisticsUpdateCfg.lowDealyAt) {
+        if (diff <= this.statisticsUpdateCfg.lowDealyAt) {
             return this.getDateAddMinutes(video.statisticsUpdatedAt, this.statisticsUpdateCfg.delayMin);
         }
 
-        if(diff > this.statisticsUpdateCfg.lowDealyAt && diff <= this.statisticsUpdateCfg.endAt) {
-            var c: number = ((diff - this.statisticsUpdateCfg.lowDealyAt) /
+        if (diff > this.statisticsUpdateCfg.lowDealyAt && diff <= this.statisticsUpdateCfg.endAt) {
+            const c = ((diff - this.statisticsUpdateCfg.lowDealyAt) /
                 (this.statisticsUpdateCfg.endAt - this.statisticsUpdateCfg.lowDealyAt));
-            var delay: number =  (1- c) * this.statisticsUpdateCfg.delayMin + c * this.statisticsUpdateCfg.delayMax;
+            const delay =  (1 - c) * this.statisticsUpdateCfg.delayMin + c * this.statisticsUpdateCfg.delayMax;
             return this.getDateAddMinutes(video.statisticsUpdatedAt, delay);
         }
 
-        var diffTrends: number = this.getDateDiffMinutes(video.trendsAt, video.statisticsUpdatedAt);
-        if(diffTrends <= this.statisticsUpdateCfg.lowDealyAt) {
+        const diffTrends = this.getDateDiffMinutes(video.trendsAt, video.statisticsUpdatedAt);
+        if (diffTrends <= this.statisticsUpdateCfg.lowDealyAt) {
             return this.getDateAddMinutes(video.statisticsUpdatedAt, this.statisticsUpdateCfg.delayMax);
         }
 

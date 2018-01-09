@@ -2,33 +2,32 @@ import { Request, Response } from "express";
 import { Op } from "sequelize";
 import Video from "../../models/db/Video";
 
-
-export let index:(req: Request, res: Response) => any  = (req: Request, res: Response) => {
+export let index: (req: Request, res: Response) => any  = (req: Request, res: Response) => {
     Video.findAll({
+        limit: 50,
+        order: [
+            ["lastViolationAt", "DESC"],
+        ],
         where: {
             lastViolationAt: {
-                [Op.ne]: null
-            }
+                [Op.ne]: null,
+            },
         },
-        order: [
-            ["lastViolationAt", "DESC"]
-        ],
-        limit: 50
     })
     .then((videoList) => {
-        var videoListLike: Video[] = [];
-        var videoListDislike: Video[] = [];
+        const videoListLike: Video[] = [];
+        const videoListDislike: Video[] = [];
 
-        for (var video of videoList) {
-            if(video.likeViolationCnt > 0) {
+        for (const video of videoList) {
+            if (video.likeViolationCnt > 0) {
                 videoListLike.push(video);
             }
 
-            if(video.dislikeViolationCnt > 0) {
+            if (video.dislikeViolationCnt > 0) {
                 videoListDislike.push(video);
             }
         }
 
-        res.render("index", { videoListLike: videoListLike, videoListDislike: videoListDislike });
+        res.render("index", { videoListLike, videoListDislike });
     });
 };

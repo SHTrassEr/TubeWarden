@@ -1,39 +1,29 @@
 import { Promise } from "bluebird";
 import ViolationService from "../grabber/service/violationService";
 
-
+import Statistics from "../models/db/Statistics";
+import Video from "../models/db/Video";
 import sequelize from "../sequelize";
-import Statistics  from "../models/db/Statistics";
-import Video   from "../models/db/Video";
 
+const violationService: ViolationService = new ViolationService();
 
-var violationService: ViolationService = new ViolationService();
-
-var totalD: number = 0;
-
-function isStatisticsAtLine(stl: Statistics, stm: Statistics, str: Statistics): boolean {
-    var arr: Statistics[] = [stl, stm, str];
-
-    return violationService.isStatisticsAtLine(arr, "likeCount")
-        && violationService.isStatisticsAtLine(arr, "dislikeCount")
-        && violationService.isStatisticsAtLine(arr, "viewCount");
-}
+let totalD: number = 0;
 
 function process(video: Video): Promise {
     return Statistics.findAll({
         where: {
-            videoId: video.videoId
+            videoId: video.videoId,
         },
-        order: ["createdAt"]
+        order: ["createdAt"],
     })
     .then((statisticsList: Statistics[]) => {
 
-        var s1: Statistics = null;
-        var s2: Statistics = null;
-        for(var st of statisticsList) {
+        let s1: Statistics = null;
+        let s2: Statistics = null;
+        for (const st of statisticsList) {
 
-            if(s1 != null && s2 != null) {
-                if(isStatisticsAtLine(s1, s2, st)) {
+            if (s1 != null && s2 != null) {
+                if (violationService.isStatisticsAtLine(st, [s1, s2])) {
                     totalD++;
 
                     s2.destroy();
@@ -49,15 +39,13 @@ function process(video: Video): Promise {
     });
 }
 
-
 sequelize.authenticate()
 .then(() => {
     return Video.findAll();
 })
 .then((videoList) => {
-    return Promise.each(videoList, video => process(video));
+    return Promise.each(videoList, (video) => process(video));
 })
 .then(() => {
-    console.log(totalD);
     sequelize.close();
 });
