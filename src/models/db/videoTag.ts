@@ -8,11 +8,11 @@ import Video from "./video";
 })
 export default class VideoTag extends Model<VideoTag> {
 
-    @ForeignKey(() => Tag)
-    @Column
-    public tagId: number;
-
     @ForeignKey(() => Video)
     @Column
     public videoId: string;
+
+    @ForeignKey(() => Tag)
+    @Column
+    public tagId: number;
 }
