@@ -12,7 +12,7 @@ import VideoTag from "./videoTag";
 export default class Tag extends Model<Tag> {
 
     @Column({ primaryKey: true, autoIncrement: true })
-    public videoId: number;
+    public id: number;
 
     @Column
     public title: string;
