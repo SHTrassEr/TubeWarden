@@ -1,10 +1,15 @@
-import Video from "../models/db/Video";
+import Channel from "../models/db/channel";
+import Video from "../models/db/video";
+
 import sequelize from "../sequelize";
 
 sequelize.sync()
     .then(() => {
-        Video.findAll()
-        .then((vl) => {
-            sequelize.close();
+        Channel.findAll(). then (() => {
+            Video.findAll()
+            .then((vl) => {
+                sequelize.close();
+            });
         });
+
     });

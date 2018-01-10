@@ -1,38 +1,56 @@
-import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/ItemInfo";
+import { Op } from "sequelize";
+import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/itemInfo";
 
-import Statistics from "../../models/db/Statistics";
-import Video from "../../models/db/Video";
+import Statistics from "../../models/db/statistics";
+import Video from "../../models/db/video";
 
-import GoogleVideoService from "../../google/googleVideoService";
-import ViolationService from "./violationService";
+import GoogleVideoService from "../service/googleVideoService";
+import VideoService from "../service/videoService";
+import ViolationService from "../service/violationService";
 
-export default class StatisticsGrabberService {
+export default class StatisticsGrabber {
 
-    protected googleVideoService = new GoogleVideoService();
+    protected googleVideoService: GoogleVideoService;
     protected violationService = new ViolationService();
+    protected videoService: VideoService;
     protected auth;
     protected statisticsUpdateCfg;
 
     constructor(auth: any, statisticsUpdateCfg: any) {
-        this.auth = auth;
         this.statisticsUpdateCfg = statisticsUpdateCfg;
+        this.googleVideoService = new GoogleVideoService(auth);
+        this.videoService = new VideoService(this.googleVideoService);
     }
 
-    public async update(videoIdList: string[]): Promise<any> {
-        const statisticsInfoList = await this.googleVideoService.getStatistics(this.auth, videoIdList);
-        const statisticsInfoHash = this.createStatisticsInfoHash(statisticsInfoList);
-        const videoList = await Video.findAll({where: { videoId: Array.from(statisticsInfoHash.keys())}});
-        for (const video of videoList) {
-            await this.saveStatistics(video, statisticsInfoHash.get(video.videoId));
+    public async process(maxResults: number): Promise<number> {
+        const videoList = await Video.findAll({
+            limit: maxResults,
+            where: {
+                deleted: false,
+                nextStatisticsUpdateAt: { [Op.lt]: new Date() },
+        }});
+
+        if (videoList.length > 0) {
+            await this.update(videoList);
         }
 
-        const deletedVideoIdList = videoIdList.filter((videoId) => !statisticsInfoHash.has(videoId));
-        await this.updateDeletedVideoList(deletedVideoIdList);
+        return videoList.length;
     }
 
-    protected async updateDeletedVideoList(deletedVideoIdList: string[]) {
-        if (deletedVideoIdList.length > 0) {
-            return Video.update({ deleted: true, deletedAt: new Date() }, {where: {videoId: deletedVideoIdList}});
+    public async update(videoList: Video[]): Promise<any> {
+        const videoIdList = videoList.map((v) => v.videoId);
+        const statisticsInfoList = await this.googleVideoService.getVideoStatistics(videoIdList);
+        const statisticsInfoHash = this.createStatisticsInfoHash(statisticsInfoList);
+
+        for (const video of videoList) {
+            if (statisticsInfoHash.has(video.videoId)) {
+                await this.saveStatistics(video, statisticsInfoHash.get(video.videoId));
+            }
+        }
+
+        if (videoIdList.length !== statisticsInfoHash.size) {
+            const deletedVideoIdList = videoIdList.filter((videoId) => !statisticsInfoHash.has(videoId));
+            await this.videoService.setDeletedVideoList(deletedVideoIdList);
         }
     }
 

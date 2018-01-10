@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
-import Video from "../../models/db/Video";
+import Video from "../../models/db/video";
 
 export let index: (req: Request, res: Response) => any  = (req: Request, res: Response) => {
     Video.findAll({

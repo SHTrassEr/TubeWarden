@@ -1,4 +1,8 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+
+import Channel from "./channel";
+import Tag from "./tag";
+import VideoTag from "./videoTag";
 
 @Table( {
     tableName: "videos",
@@ -52,6 +56,13 @@ export default class Video extends Model<Video> {
     @Column(DataType.DATE)
     public trendsAt: Date;
 
+    // @ForeignKey(() => Channel)
     @Column
     public channelId: string;
+
+    // @BelongsTo(() => Channel, "channelId")
+    public channel: Channel;
+
+    @BelongsToMany(() => Tag, () => VideoTag, "videoId")
+    public tags: Tag[];
 }

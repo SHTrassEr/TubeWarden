@@ -1,4 +1,6 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+
+import Video from "./video";
 
 @Table({
     tableName: "channels",
@@ -7,7 +9,7 @@ import { Column, DataType, Model, Table } from "sequelize-typescript";
 export default class Channel extends Model<Channel> {
 
     @Column({ primaryKey: true })
-    public Id: string;
+    public id: string;
 
     @Column
     public title: string;
@@ -29,4 +31,13 @@ export default class Channel extends Model<Channel> {
 
     @Column
     public dislikeViolationCount: number;
+
+    @Column({ defaultValue: false })
+    public deleted: boolean;
+
+    @Column(DataType.DATE)
+    public deletedAt: Date;
+
+    // @HasMany(() => Video)
+    public videos: Video[];
 }

@@ -1,12 +1,19 @@
 import * as google from "googleapis";
 
-import { GoogleResultItemList, GoogleVideoInfo } from "../models/google/ItemInfo";
+import { GoogleChannelInfo, GoogleResultItemList, GoogleVideoInfo } from "../../models/google/ItemInfo";
 
 const service: any = google.youtube("v3");
 
 export default class GoogleVideoService {
 
-    public getStatistics(auth: any, videoIdList: string[]): Promise<GoogleVideoInfo[]> {
+    protected auth;
+
+    constructor(auth: any) {
+        this.auth = auth;
+    }
+
+    public getVideoStatistics(videoIdList: string[]): Promise<GoogleVideoInfo[]> {
+        const auth = this.auth;
         return new Promise((resolve, reject) => {
             service.videos.list({
                 auth,
@@ -27,13 +34,14 @@ export default class GoogleVideoService {
         });
     }
 
-    public getInfo(auth: any, videoIdList: string[]): Promise<GoogleVideoInfo[]> {
+    public getVideoInfo(videoIdList: string[]): Promise<GoogleVideoInfo[]> {
+        const auth = this.auth;
         return new Promise((resolve, reject) => {
             service.videos.list({
                 auth,
                 part: "snippet",
                 id: videoIdList.join(),
-                fields: "items(id,snippet(channelId,publishedAt,title))",
+                fields: "items(id,snippet(tags,channelId,publishedAt,title))",
             }, (err, data) => {
                 if (err) {
                     reject(err);
@@ -48,7 +56,30 @@ export default class GoogleVideoService {
         });
     }
 
-    public getMostPopularVideoIdList(auth: any, regionCode: string, maxResults: number): Promise<string[]> {
+    public getChannelInfo(channelIdList: string[]): Promise<GoogleChannelInfo[]> {
+        const auth = this.auth;
+        return new Promise((resolve, reject) => {
+            service.channels.list({
+                auth,
+                part: "snippet",
+                id: channelIdList.join(),
+                fields: "items(id,snippet(title))",
+            }, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    if (data.items) {
+                        resolve(data.items);
+                    } else {
+                        resolve([]);
+                    }
+                }
+            });
+        });
+    }
+
+    public getMostPopularVideoId(regionCode: string, maxResults: number): Promise<string[]> {
+        const auth = this.auth;
         return new Promise((resolve, reject) => {
             service.videos.list({
                 auth,

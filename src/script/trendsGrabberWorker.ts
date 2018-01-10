@@ -2,14 +2,14 @@ import * as schedule from "node-schedule";
 import sequelize from "../sequelize";
 
 import Config from "../config";
-import TrendsGrabberService from "../grabber/service/trendsGrabberService";
+import TrendsGrabber from "../core/grabber/trendsGrabber";
 
 const trendsGrabberService
-    = new TrendsGrabberService(Config.Google.key, Config.Google.regionCode, Config.Google.maxResults);
+    = new TrendsGrabber(Config.Google.key, Config.Google.regionCode);
 
 sequelize.authenticate()
     .then(() => {
-         schedule.scheduleJob(Config.Service.trends.cron, () => {
-            trendsGrabberService.update();
+         schedule.scheduleJob(Config.Service.trends.cron, async () => {
+            await trendsGrabberService.process(Config.Google.maxResults);
          });
     });

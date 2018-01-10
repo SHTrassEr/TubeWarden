@@ -8,16 +8,21 @@
             "task": "default",
             "problemMatcher": [
                 "$tsc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            ]
         },
         {
             "type": "gulp",
             "task": "clean",
             "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "compile",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

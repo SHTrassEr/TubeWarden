@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
-import Statistics from "../../models/db/Statistics";
-import Video from "../../models/db/Video";
+import Statistics from "../../models/db/statistics";
+import Video from "../../models/db/video";
 
 export let getVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
     Video.findAll({ limit: 50 })

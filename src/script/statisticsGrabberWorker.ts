@@ -1,22 +1,18 @@
+import { Op } from "sequelize";
+
 import * as schedule from "node-schedule";
 import sequelize from "../sequelize";
 
 import Config from "../config";
-import StatisticsUpdateWorker from "../grabber/StatisticsUpdateWorker";
+import StatisticsGrabber from "../core/grabber/statisticsGrabber";
+import Video from "../models/db/video";
 
-const statisticsUpdateWorker
-    = new StatisticsUpdateWorker(Config.Google.key, Config.Google.maxResults, Config.Service.statistics.update);
+const statisticsGrabberService
+    = new StatisticsGrabber(Config.Google.key, Config.Service.statistics.update);
 
-let isJobActive: boolean = false;
 sequelize.authenticate()
     .then(() => {
-        schedule.scheduleJob(Config.Service.statistics.cron, () => {
-            if (!isJobActive) {
-                isJobActive = true;
-                statisticsUpdateWorker.process()
-                    .then(() => {
-                        isJobActive = false;
-                    }) ;
-            }
+        schedule.scheduleJob(Config.Service.statistics.cron, async () => {
+            await statisticsGrabberService.process(Config.Google.maxResults);
         });
     });

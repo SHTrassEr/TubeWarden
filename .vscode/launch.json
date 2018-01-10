@@ -39,6 +39,12 @@
             "request": "launch",
             "name": "decreaseStatisticsTableSize",
             "program": "${workspaceFolder}/bin/script\\decreaseStatisticsTableSize.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "UpdateVideoChannel",
+            "program": "${workspaceFolder}/bin/script\\UpdateVideoChannel.js"
         }
 
     ]

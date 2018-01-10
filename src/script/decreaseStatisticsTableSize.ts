@@ -1,8 +1,8 @@
 import { Promise } from "bluebird";
-import ViolationService from "../grabber/service/violationService";
+import ViolationService from "../core/service/violationService";
 
-import Statistics from "../models/db/Statistics";
-import Video from "../models/db/Video";
+import Statistics from "../models/db/statistics";
+import Video from "../models/db/video";
 import sequelize from "../sequelize";
 
 const violationService: ViolationService = new ViolationService();
@@ -25,9 +25,7 @@ function process(video: Video): Promise {
             if (s1 != null && s2 != null) {
                 if (violationService.isStatisticsAtLine(st, [s1, s2])) {
                     totalD++;
-
                     s2.destroy();
-
                     s2 = st;
                     continue;
                 }

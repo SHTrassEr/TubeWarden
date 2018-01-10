@@ -1,4 +1,4 @@
-import Statistics from "../../models/db/Statistics";
+import Statistics from "../../models/db/statistics";
 
 const violationFactor = 0.015;
 const minViolationValue = 200;
