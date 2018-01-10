@@ -38,6 +38,6 @@ export default class Channel extends Model<Channel> {
     @Column(DataType.DATE)
     public deletedAt: Date;
 
-    // @HasMany(() => Video)
+    @HasMany(() => Video)
     public videos: Video[];
 }

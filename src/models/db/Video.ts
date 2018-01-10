@@ -56,11 +56,11 @@ export default class Video extends Model<Video> {
     @Column(DataType.DATE)
     public trendsAt: Date;
 
-    // @ForeignKey(() => Channel)
+    @ForeignKey(() => Channel)
     @Column
     public channelId: string;
 
-    // @BelongsTo(() => Channel, "channelId")
+    @BelongsTo(() => Channel, "channelId")
     public channel: Channel;
 
     @BelongsToMany(() => Tag, () => VideoTag, "videoId")

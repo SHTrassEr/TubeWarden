@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
+import Channel from "../../models/db/channel";
 import Video from "../../models/db/video";
 
-export let getVideo: (req: Request, res: Response) => any = (req: Request, res: Response) => {
-    Video.findOne({
+export async function getVideo(req: Request, res: Response) {
+    const video = await Video.findOne({
+        include: [Channel],
         where: {
             videoId: req.params.videoId,
         },
-    })
-    .then((video) => {
-        res.render("statistics", {
-            title: video.title,
-            videoId: req.params.videoId });
     });
-};
+
+    res.render("statistics", { video });
+}

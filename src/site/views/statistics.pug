@@ -1,10 +1,22 @@
 extends layout
 
 block content
-  h3 Статистика
+  h3 Статистика видео
 
-  p 
-    a(href='https://www.youtube.com/watch?v=' + videoId )= title
+  div.media
+    div.media-left
+      a(href='https://www.youtube.com/watch?v=' + video.videoId )
+        img.card-img-left(src='https://img.youtube.com/vi/' + video.videoId + '/2.jpg')
+    div.media-body
+      h4.media-heading
+        a(href='https://www.youtube.com/watch?v=' + video.videoId )= video.title
+      if video.channel
+        p Канал: 
+          a(href='https://www.youtube.com/channel/' + video.channel.id )= video.channel.title
+      if video.deletedAt
+        p 
+          i Удалено: 
+            span.date-time-value(data-value=video.deletedAt)
   p
     canvas#statisticsLikeChart(height=300)
 
@@ -13,7 +25,7 @@ block content
 
 block script
   script.
-    videoId='#{videoId}'
+    videoId='#{video.videoId}'
 
   script(src='//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js')
   script(src='/javascripts/statistics.js')
