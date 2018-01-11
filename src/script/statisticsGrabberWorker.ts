@@ -7,8 +7,12 @@ import Config from "../config";
 import StatisticsGrabber from "../core/grabber/statisticsGrabber";
 import Video from "../models/db/video";
 
+import GoogleVideoService from "../core/service/googleVideoService";
+
+const googleVideoService = new GoogleVideoService(Config.Google.key);
+
 const statisticsGrabberService
-    = new StatisticsGrabber(Config.Google.key, Config.Service.statistics.update);
+    = new StatisticsGrabber(googleVideoService, Config.Service.statistics.update);
 
 sequelize.authenticate()
     .then(() => {

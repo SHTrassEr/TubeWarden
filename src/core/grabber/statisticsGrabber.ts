@@ -16,10 +16,10 @@ export default class StatisticsGrabber {
     protected auth;
     protected statisticsUpdateCfg;
 
-    constructor(auth: any, statisticsUpdateCfg: any) {
+    constructor(googleVideoService: GoogleVideoService, statisticsUpdateCfg: any) {
         this.statisticsUpdateCfg = statisticsUpdateCfg;
-        this.googleVideoService = new GoogleVideoService(auth);
-        this.videoService = new VideoService(this.googleVideoService);
+        this.googleVideoService = googleVideoService;
+        this.videoService = new VideoService();
     }
 
     public async process(maxResults: number): Promise<number> {

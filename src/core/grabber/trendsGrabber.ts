@@ -11,14 +11,13 @@ export default class TrendsGrabber {
     protected regionCode: string;
     protected videoService: VideoService;
 
-    constructor(auth: any, regionCode: string) {
-        this.auth = auth;
+    constructor(googleVideoService: GoogleVideoService, regionCode: string) {
         this.regionCode = regionCode;
-        this.googleVideoService = new GoogleVideoService(auth);
-        this.videoService = new VideoService(this.googleVideoService);
+        this.googleVideoService = googleVideoService;
+        this.videoService = new VideoService();
     }
 
-    public async process(maxResults: number): Promise<any> {
+    public async process(maxResults: number): Promise<Video[]> {
         const trendsIdList = await this.googleVideoService.getMostPopularVideoId(this.regionCode, maxResults);
         if (trendsIdList && trendsIdList.length > 0) {
             const videoList = await Video.findAll({where: { videoId: trendsIdList }});
@@ -26,18 +25,21 @@ export default class TrendsGrabber {
             await this.updateVideoList(videoIdList);
             const videoIdSet = new Set<string>(videoIdList);
             const newVideoIdList = trendsIdList.filter((videoId) => !videoIdSet.has(videoId));
-            await this.createVideoList(newVideoIdList);
+            return this.createVideoList(newVideoIdList);
         }
     }
 
-    protected async createVideoList(newVideoIdList: string[]): Promise<any> {
+    protected async createVideoList(newVideoIdList: string[]): Promise<Video[]> {
+        const newVideoList = [];
         if (newVideoIdList.length > 0) {
             const videoInfoList = await this.googleVideoService.getVideoInfo(newVideoIdList);
 
             for (const videoInfo of videoInfoList) {
-                await this.videoService.createVideo(videoInfo);
+                newVideoList.push(await this.videoService.createVideo(videoInfo));
             }
         }
+
+        return newVideoList;
     }
 
     protected async updateVideoList(videoIdList: string[]): Promise<any> {

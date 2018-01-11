@@ -1,3 +1,4 @@
+import { IFindOptions } from "sequelize-typescript/lib/interfaces/IFindOptions";
 import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
 import Channel from "../../models/db/channel";
@@ -15,13 +16,19 @@ export default class ChannelGrabber {
         this.channelService = new ChannelService();
     }
 
-    public async processEmptyTitle(maxResults: number): Promise<number> {
-        const channelList = await Channel.findAll({
+    public async processEmptyTitle(maxResults: number, channelIdList?: string[] ): Promise<number> {
+        const findOptions: IFindOptions<Channel> = {
             limit: maxResults,
             where: {
                 deleted: false,
                 title: null,
-        }});
+        }};
+
+        if (channelIdList) {
+            (findOptions as any).where.id = channelIdList;
+        }
+
+        const channelList = await Channel.findAll(findOptions);
 
         if (channelList.length > 0) {
             await this.update(channelList);

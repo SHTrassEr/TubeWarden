@@ -1,6 +1,5 @@
 import { GoogleVideoInfo } from "../../models/google/itemInfo";
 
-import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
 import ChannelService from "./channelService";
 import GoogleVideoService from "./googleVideoService";
@@ -8,31 +7,12 @@ import TagService from "./tagService";
 
 export default class VideoService {
 
-    protected googleVideoService: GoogleVideoService;
     protected channelService: ChannelService;
     protected tagService: TagService;
 
-    constructor(googleVideoService: GoogleVideoService) {
-        this.googleVideoService = googleVideoService;
+    constructor() {
         this.channelService = new ChannelService();
         this.tagService = new TagService();
-    }
-
-    public async updateList(videoList: Video[]): Promise<any> {
-        const videoIdList = videoList.map((v) => v.videoId);
-        const videoInfoList = await this.googleVideoService.getVideoInfo(videoIdList);
-        const videoInfoHash = this.createVideoInfoHash(videoInfoList);
-
-        for (const video of videoList) {
-            if (videoInfoHash.has(video.videoId)) {
-                await this.updateVideo(video, videoInfoHash.get(video.videoId));
-            }
-        }
-
-        if (videoIdList.length !== videoInfoHash.size) {
-            const deletedVideoIdList = videoIdList.filter((videoId) => !videoInfoHash.has(videoId));
-            await this.setDeletedVideoList(deletedVideoIdList);
-        }
     }
 
     public async updateVideo(video: Video, videoInfo: GoogleVideoInfo) {
@@ -79,11 +59,5 @@ export default class VideoService {
 
         video.channel = await this.channelService.getOrCreateChannelById(channelId);
         video.channelId = channelId;
-    }
-
-    protected createVideoInfoHash(infoList: GoogleVideoInfo[]): Map<string, GoogleVideoInfo> {
-        return infoList.reduce((map, obj) => {
-            return map.set(obj.id, obj);
-        }, new Map<string, GoogleVideoInfo>());
     }
 }

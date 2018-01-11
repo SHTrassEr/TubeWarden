@@ -4,8 +4,12 @@ import sequelize from "../sequelize";
 import Config from "../config";
 import TrendsGrabber from "../core/grabber/trendsGrabber";
 
+import GoogleVideoService from "../core/service/googleVideoService";
+
+const googleVideoService = new GoogleVideoService(Config.Google.key);
+
 const trendsGrabberService
-    = new TrendsGrabber(Config.Google.key, Config.Google.regionCode);
+    = new TrendsGrabber(googleVideoService, Config.Google.regionCode);
 
 sequelize.authenticate()
     .then(() => {

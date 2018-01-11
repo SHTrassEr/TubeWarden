@@ -1,7 +1,6 @@
 import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
 import Tag from "../../models/db/tag";
-import GoogleVideoService from "./googleVideoService";
 
 export default class TagService {
 
