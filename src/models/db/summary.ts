@@ -11,6 +11,6 @@ export default class Summary extends Model<Summary> {
     @Column({ primaryKey: true })
     public id: string;
 
-    @Column
+    @Column({ defaultValue: 0 })
     public value: number;
 }

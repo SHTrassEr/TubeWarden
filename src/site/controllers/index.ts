@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
+import SummaryService from "../../core/service/summaryService";
 import Video from "../../models/db/video";
 
-export let index: (req: Request, res: Response) => any  = (req: Request, res: Response) => {
-    Video.findAll({
+const summaryService = new SummaryService();
+
+export async function index(req: Request, res: Response) {
+    const videoList = await Video.findAll({
         limit: 50,
         order: [
             ["lastViolationAt", "DESC"],
@@ -13,21 +16,24 @@ export let index: (req: Request, res: Response) => any  = (req: Request, res: Re
                 [Op.ne]: null,
             },
         },
-    })
-    .then((videoList) => {
-        const videoListLike: Video[] = [];
-        const videoListDislike: Video[] = [];
+    });
 
-        for (const video of videoList) {
-            if (video.likeViolationCnt > 0) {
-                videoListLike.push(video);
-            }
+    const videoListLike: Video[] = [];
+    const videoListDislike: Video[] = [];
 
-            if (video.dislikeViolationCnt > 0) {
-                videoListDislike.push(video);
-            }
+    for (const video of videoList) {
+        if (video.likeViolationCnt > 0) {
+            videoListLike.push(video);
         }
 
-        res.render("index", { videoListLike, videoListDislike });
-    });
-};
+        if (video.dislikeViolationCnt > 0) {
+            videoListDislike.push(video);
+        }
+    }
+
+    const totalVideoCount = await summaryService.getVideoCount();
+    const totalViolationCount = await summaryService.getViolationCount();
+
+    res.render("index", { videoListLike, videoListDislike, totalVideoCount, totalViolationCount });
+
+}

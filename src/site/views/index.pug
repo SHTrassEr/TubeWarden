@@ -13,3 +13,12 @@ block content
     div.list-group.list-video-group
       each video in videoListDislike
         include includes/item.pug    
+
+
+  div.panel.panel-default
+    div.panel-heading Статистика
+    div.panel-body
+      p Обработано видео: 
+        i= totalVideoCount
+      p Выявлено нарушений:
+        i= totalViolationCount

@@ -66,4 +66,12 @@ export default class Video extends Model<Video> {
 
     @BelongsToMany(() => Tag, () => VideoTag, "videoId")
     public tags: Tag[];
+
+    public isViolated(): boolean {
+        if (this.lastViolationAt) {
+            return true;
+        }
+
+        return false;
+    }
 }

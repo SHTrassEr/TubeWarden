@@ -1,10 +1,12 @@
 import { Op } from "sequelize";
+
 import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/itemInfo";
 
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
 
 import GoogleVideoService from "../service/googleVideoService";
+import SummaryService from "../service/summaryService";
 import VideoService from "../service/videoService";
 import ViolationService from "../service/violationService";
 
@@ -13,6 +15,7 @@ export default class StatisticsGrabber {
     protected googleVideoService: GoogleVideoService;
     protected violationService = new ViolationService();
     protected videoService: VideoService;
+    protected summaryService: SummaryService;
     protected auth;
     protected statisticsUpdateCfg;
 
@@ -20,6 +23,7 @@ export default class StatisticsGrabber {
         this.statisticsUpdateCfg = statisticsUpdateCfg;
         this.googleVideoService = googleVideoService;
         this.videoService = new VideoService();
+        this.summaryService = new SummaryService();
     }
 
     public async process(maxResults: number): Promise<number> {
@@ -68,10 +72,16 @@ export default class StatisticsGrabber {
             statisticsList.push(statistics);
         }
 
-        return this.updateVideo(video, statisticsList);
+        const isViolated = video.isViolated();
+        video = await this.updateVideo(video, statisticsList);
+        if (!isViolated && video.isViolated()) {
+            await this.summaryService.increaseViolationCount();
+        }
+
+        return video;
     }
 
-    protected async updateVideo(video: Video, statisticsList: Statistics[]): Promise<any> {
+    protected async updateVideo(video: Video, statisticsList: Statistics[]): Promise<Video> {
         if (statisticsList && statisticsList.length > 0) {
             video.statisticsUpdatedAt = new Date();
 

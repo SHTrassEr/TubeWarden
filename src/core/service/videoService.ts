@@ -3,16 +3,19 @@ import { GoogleVideoInfo } from "../../models/google/itemInfo";
 import Video from "../../models/db/video";
 import ChannelService from "./channelService";
 import GoogleVideoService from "./googleVideoService";
+import SummaryService from "./summaryService";
 import TagService from "./tagService";
 
 export default class VideoService {
 
     protected channelService: ChannelService;
     protected tagService: TagService;
+    protected summaryService: SummaryService;
 
     constructor() {
         this.channelService = new ChannelService();
         this.tagService = new TagService();
+        this.summaryService = new SummaryService();
     }
 
     public async updateVideo(video: Video, videoInfo: GoogleVideoInfo) {
@@ -33,6 +36,7 @@ export default class VideoService {
         video.nextStatisticsUpdateAt = new Date();
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         video = await video.save();
+        await this.summaryService.increaseVideoCount();
         return this.setVideoTagTitleList(video, videoInfo.snippet.tags);
     }
 
