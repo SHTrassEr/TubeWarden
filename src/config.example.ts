@@ -13,20 +13,20 @@ export default class Config {
             supportBigNumbers: true,
             bigNumberStrings: true,
             charset: "utf8mb4",
-            collate: "utf8mb4_unicode_ci"
+            collate: "utf8mb4_unicode_ci",
         },
 
-        debug: true
+        debug: true,
     };
 
     public static Server = {
         host: "127.0.0.1",
-        port: "3000"
+        port: "3000",
     };
 
     public static Service = {
         trends: {
-            cron: "*/5 * * * *"
+            cron: "*/5 * * * *",
         },
         statistics: {
             cron: "*/10 * * * * *",
@@ -34,9 +34,9 @@ export default class Config {
                 delayMin: 2,
                 delayMax: 20,
                 lowDealyAt: 60 * 22 ,
-                endAt: 2 * 60 * 24
-            }
-        }
+                endAt: 2 * 60 * 24,
+            },
+        },
     };
 
     public static SSL = {
@@ -48,6 +48,6 @@ export default class Config {
     public static Google = {
         key: "KEY",
         regionCode: "ru",
-        maxResults: 50
+        maxResults: 50,
     };
 }
