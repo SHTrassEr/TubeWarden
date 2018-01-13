@@ -5,25 +5,22 @@
     "tasks": [
         {
             "type": "gulp",
-            "task": "default",
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "type": "gulp",
             "task": "clean",
             "problemMatcher": []
         },
         {
             "type": "npm",
             "script": "compile",
+            "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "build",
             "problemMatcher": [],
-
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

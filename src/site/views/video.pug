@@ -12,7 +12,7 @@ block content
     div.media-body
       h4.media-heading
         a(href='https://www.youtube.com/watch?v=' + video.videoId )= video.title
-      if video.channel
+      if (video.channel && video.channel.title)
         p Канал: 
           a(href='https://www.youtube.com/channel/' + video.channel.id )= video.channel.title
       if video.deletedAt
@@ -30,4 +30,4 @@ block script
     videoId='#{video.videoId}'
 
   script(src='//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js')
-  script(src='/javascripts/statistics.js')
+  script(src='/javascripts/video.js')

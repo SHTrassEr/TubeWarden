@@ -7,11 +7,18 @@ import Video from "../../models/db/video";
 const key = {
     videoCount: "videoCount",
     violationCount: "violationCount",
+    violationCount_ge_2: "violationCount_ge_2",
+    violationCount_ge_3: "violationCount_ge_3",
+
 };
 
 const videoCountKey = "videoCount";
 
 export default class SummaryService {
+
+    public async getAll(): Promise<Summary[]> {
+        return await Summary.findAll();
+    }
 
     public async updateAll() {
         await this.updateVideoCount();

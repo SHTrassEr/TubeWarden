@@ -9,8 +9,10 @@
         "emitDecoratorMetadata": true
     },
     "exclude": [
-        "./config.example.ts",
+        "config.example.ts",
         "node_modules",
-        "**/*.spec.ts"
+        "site/public",
+        "**/*.spec.ts",
+        "**/*.json"
     ]
 }

@@ -1,34 +1,36 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import Statistics from "../../models/db/statistics";
+import Summary from "../../models/db/summary";
 import Video from "../../models/db/video";
 
-export let getVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
-    Video.findAll({ limit: 50 })
-    .then((videoList) => {
-        res.json(videoList);
-    });
-};
+export async function getVideoList(req: Request, res: Response) {
+    const videoList = await Video.findAll({ limit: 50 });
+    res.json(videoList);
+}
 
-export let getStatisticsByVideo: (req: Request, res: Response) => any = (req: Request, res: Response) => {
-    Statistics.findAll({
+export async function getStatisticsByVideo(req: Request, res: Response) {
+    const statisticsList = await Statistics.findAll({
         where: {
             videoId: req.params.videoId,
         },
-    })
-    .then((statisticsList) => {
-        res.json(statisticsList);
     });
-};
 
-export let getTrendsVideoList: (req: Request, res: Response) => any = (req: Request, res: Response) => {
-    Video.findAll({
-        limit: 150 ,
+    res.json(statisticsList);
+}
+
+export async function getTrendsVideoList(req: Request, res: Response) {
+    const videoList = await Video.findAll({
+        limit: 100 ,
         order: [
             ["trendsAt", "DESC"],
         ],
-    })
-    .then((videoList) => {
-        res.json(videoList);
     });
-};
+
+    res.json(videoList);
+}
+
+export async function getSummaryList(req: Request, res: Response) {
+    const summaryList = await Summary.findAll();
+    res.json(summaryList);
+}

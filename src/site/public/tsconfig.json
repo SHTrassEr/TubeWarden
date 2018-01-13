@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "system",
+        "moduleResolution": "node",
+		"outDir": "../../../bin/site/public/javascripts",
+        "sourceMap": false,
+        "jsx": "react",
+    },
+    "include": [
+        "javascripts/d.ts/*.d.ts",
+        "javascripts/**/*.ts"
+    ]
+}

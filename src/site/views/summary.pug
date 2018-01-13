@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  div.list-header
+    h3 Общая статистика по всем видео
+    div Вся собранная информация по видео: история изменения количества лайков, дизлайков, просмотров
+
+  p
+    canvas#statisticsLikeChart(height=300)
+
+
+block script
+
+  script(src='//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js')
+  script(src='/javascripts/summary.js')

@@ -13,7 +13,8 @@ import * as favicon from "serve-favicon";
 import * as aboutController from "./controllers/about";
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
-import * as statisticsController from "./controllers/statistics";
+import * as summaryController from "./controllers/summary";
+import * as videoController from "./controllers/video";
 import * as videosController from "./controllers/videos";
 
 import Config from "../config";
@@ -44,8 +45,10 @@ app.get("/", indexController.index);
 app.get("/videos", videosController.getAllVideo);
 app.get("/videos/:pageNum", videosController.getAllVideo);
 app.get("/about", aboutController.about);
-app.get("/video/:videoId", statisticsController.getVideo);
+app.get("/summary", summaryController.getSummary);
+app.get("/video/:videoId", videoController.getVideo);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
+app.get("/api/summaryList", cors(), apiController.getTrendsVideoList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
 
 // catch 404 and forward to error handler

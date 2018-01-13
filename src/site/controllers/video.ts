@@ -10,5 +10,5 @@ export async function getVideo(req: Request, res: Response) {
         },
     });
 
-    res.render("statistics", { video });
+    res.render("video", { video });
 }
