@@ -1,18 +1,22 @@
 extends layout
 
 block content
-  div
+
+  div.list-header
     h3 Подозрение на накрутку лайков
-    div.list-group.list-video-group
-      each video in videoListLike
-        include includes/item.pug
+    div Последние видео Youtube у которых в графике изменения количества лайков замечены резкие перепады
+
+  div.list-group.list-video-group
+    each video in videoListLike
+      include includes/item.pug
           
 
-  div
+  div.list-header
     h3 Подозрение на накрутку дизлайков
-    div.list-group.list-video-group
-      each video in videoListDislike
-        include includes/item.pug    
+    div Последние видео Youtube у которых в графике изменения количества дизлайков замечены резкие перепады
+  div.list-group.list-video-group
+    each video in videoListDislike
+      include includes/item.pug    
 
 
   div.panel.panel-default

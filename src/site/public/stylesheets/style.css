@@ -2,6 +2,12 @@ body {
   padding-top: 50px;
 }
 
+.list-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 9px;
+  margin-bottom: 20px;
+}
+
 .list-video-group .list-video-item .list-video-item-info {
   margin-bottom: 0;
   font-size: 0.8em;

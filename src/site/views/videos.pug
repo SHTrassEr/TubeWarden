@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  div.list-header
+    h3 Все видео
+    div Все видео Youtube по которым собиралась статистика
+
+
+  div.list-group.list-video-group
+    each video in videoList
+        include includes/item.pug
+
+  nav
+    ul.pager
+      if (pager.previousPage)
+        li.previous
+          a(href="/videos/" + pager.previousPage) Назад
+      if (pager.nextPage)
+        li.next
+          a(href="/videos/" + pager.nextPage) Дальше

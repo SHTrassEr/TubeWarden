@@ -10,6 +10,7 @@ import VideoTag from "./videoTag";
     indexes: [
         { unique: false, fields: ["deleted", "nextStatisticsUpdateAt"] },
         { unique: false, fields: ["trendsAt"] },
+        { unique: false, fields: ["createdAt"] },
         { unique: false, fields: ["channelId"] },
     ],
 })

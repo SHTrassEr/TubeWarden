@@ -11,10 +11,10 @@ import * as path from "path";
 import * as favicon from "serve-favicon";
 
 import * as aboutController from "./controllers/about";
-import * as allController from "./controllers/all";
 import * as apiController from "./controllers/api";
 import * as indexController from "./controllers/index";
 import * as statisticsController from "./controllers/statistics";
+import * as videosController from "./controllers/videos";
 
 import Config from "../config";
 
@@ -41,7 +41,8 @@ app.use(compression());
 app.use(cache("2 minutes"));
 
 app.get("/", indexController.index);
-app.get("/all", allController.getAllVideo);
+app.get("/videos", videosController.getAllVideo);
+app.get("/videos/:pageNum", videosController.getAllVideo);
 app.get("/about", aboutController.about);
 app.get("/video/:videoId", statisticsController.getVideo);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
