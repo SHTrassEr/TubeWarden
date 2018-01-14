@@ -13,14 +13,16 @@ function formatDateTime(date: Date) {
 }
 
 function initDateTimeValue() {
-    $(".date-time-value").each(() => {
-        const date = new Date(this.getAttribute("data-value"));
-        if (date) {
-            this.appendChild (document.createTextNode(formatDateTime(date)));
-        }
-    });
+    const date = new Date(this.getAttribute("data-value"));
+    if (date) {
+        this.appendChild(document.createTextNode(formatDateTime(date)));
+    }
+}
+
+function initDateTimeListValue() {
+    $(".date-time-value").each(initDateTimeValue);
 }
 
 $(document).ready(() => {
-    initDateTimeValue();
+    initDateTimeListValue();
 });
