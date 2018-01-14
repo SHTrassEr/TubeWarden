@@ -48,7 +48,7 @@ app.get("/about", aboutController.about);
 app.get("/summary", summaryController.getSummary);
 app.get("/video/:videoId", videoController.getVideo);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
-app.get("/api/summaryList", cors(), apiController.getTrendsVideoList);
+app.get("/api/summaryList", cors(), apiController.getSummaryList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
 
 // catch 404 and forward to error handler

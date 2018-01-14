@@ -7,6 +7,10 @@ import StatisticsGrabber from "../core/grabber/statisticsGrabber";
 import TrendsGrabber from "../core/grabber/trendsGrabber";
 import GoogleVideoService from "../core/service/googleVideoService";
 
+import SummaryService from "../core/service/summaryService";
+
+const summaryService = new SummaryService();
+
 const googleVideoService = new GoogleVideoService(Config.Google.key);
 
 const trendsGrabberService
@@ -22,10 +26,8 @@ sequelize.authenticate()
     .then(() => {
          schedule.scheduleJob(Config.Service.trends.cron, async () => {
             const videoList = await trendsGrabberService.process(Config.Google.maxResults);
-            const channelIdList = videoList.filter((v) => v.channelId).map((v) => v.channelId);
-            if (channelIdList.length > 0) {
-                await channelGrabber.processEmptyTitle(Config.Google.maxResults, channelIdList);
-            }
+            await channelGrabber.processEmptyTitle(Config.Google.maxResults);
+            await summaryService.updateAll();
          });
 
          schedule.scheduleJob(Config.Service.statistics.cron, async () => {

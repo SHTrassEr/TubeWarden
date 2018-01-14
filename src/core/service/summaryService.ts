@@ -6,10 +6,10 @@ import Video from "../../models/db/video";
 
 const key = {
     videoCount: "videoCount",
-    violationCount: "violationCount",
-    violationCount_ge_2: "violationCount_ge_2",
-    violationCount_ge_3: "violationCount_ge_3",
-
+    violationVideoCount: "violationVideoCount",
+    likeViolationCount: "likeViolationCount",
+    dislikeViolationCount: "dislikeViolationCount",
+    likeAndDislikeViolationCount: "likeAndDislikeViolationCount",
 };
 
 const videoCountKey = "videoCount";
@@ -23,6 +23,9 @@ export default class SummaryService {
     public async updateAll() {
         await this.updateVideoCount();
         await this.updateViolationCount();
+        await this.updateLikeViolationCount();
+        await this.updateDislikeViolationCount();
+        await this.updateLikeAndDislikeViolationCount();
     }
 
     public async increaseVideoCount() {
@@ -30,7 +33,7 @@ export default class SummaryService {
     }
 
     public async increaseViolationCount() {
-        return await this.increaseValue(key.violationCount);
+        return await this.increaseValue(key.violationVideoCount);
     }
 
     public async getVideoCount(): Promise<number> {
@@ -38,7 +41,7 @@ export default class SummaryService {
     }
 
     public async getViolationCount(): Promise<number> {
-        return await this.getValue(key.violationCount);
+        return await this.getValue(key.violationVideoCount);
     }
 
     public async updateVideoCount() {
@@ -46,14 +49,32 @@ export default class SummaryService {
         await Summary.update({value: videoCount}, {where: {id: key.videoCount}});
     }
 
+    public async updateLikeViolationCount() {
+        const videoCount = await Video.count({where : {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: 0 }});
+        await Summary.update({value: videoCount}, {where: {id: key.likeViolationCount}});
+    }
+
+    public async updateLikeAndDislikeViolationCount() {
+        const videoCount = await Video.count({where : {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: {[Op.gt]: 0}}});
+        await Summary.update({value: videoCount}, {where: {id: key.likeAndDislikeViolationCount}});
+    }
+
+    public async updateDislikeViolationCount() {
+        const videoCount = await Video.count({where : {  dislikeViolationCnt: {[Op.gt]: 0}, likeViolationCnt: 0 }});
+        await Summary.update({value: videoCount}, {where: {id: key.dislikeViolationCount}});
+    }
+
     public async updateViolationCount() {
         const videoCount = await Video.count({where: {lastViolationAt: {[Op.ne]: null}}});
-        await Summary.update({value: videoCount}, {where: {id: key.violationCount}});
+        await Summary.update({value: videoCount}, {where: {id: key.violationVideoCount}});
     }
 
     public async initTable() {
         await Summary.findOrCreate({where: { id: key.videoCount }});
-        await Summary.findOrCreate({where: { id: key.violationCount }});
+        await Summary.findOrCreate({where: { id: key.violationVideoCount }});
+        await Summary.findOrCreate({where: { id: key.likeViolationCount }});
+        await Summary.findOrCreate({where: { id: key.dislikeViolationCount }});
+        await Summary.findOrCreate({where: { id: key.likeAndDislikeViolationCount }});
     }
 
     protected async getValue(id: string): Promise<number> {
@@ -69,6 +90,5 @@ export default class SummaryService {
         return infoList.reduce((map, obj) => {
             return map.set(obj.id, obj);
         }, new Map<string, Summary>());
-
     }
 }

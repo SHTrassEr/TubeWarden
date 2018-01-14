@@ -1,8 +1,7 @@
-declare var videoId: string;
+declare const videoId: string;
 
-$(document).ready(() => {
-
-    const options = {
+(() => {
+    const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         animation: {
@@ -43,12 +42,12 @@ $(document).ready(() => {
         },
     };
 
-    $.getJSON("/api/statistics/" + videoId, (data) => {
-        const likeDatasets = {
+    function initRatingChart(data, ctx) {
+        const chartData = {
             datasets: [{
                 label: "Лайков",
-                backgroundColor: "#268808",
-                borderColor: "#268808",
+                backgroundColor: chartColors.green,
+                borderColor: chartColors.green,
                 fill: false,
                 lineTension: 0,
                 data: data.map((d) => ( {x: new Date (d.updatedAt), y: d.likeCount } )),
@@ -56,28 +55,38 @@ $(document).ready(() => {
             {
                 label: "Дизлайков",
                 fill: false,
-                backgroundColor: "#de1616",
-                borderColor: "#de1616",
+                backgroundColor: chartColors.red,
+                borderColor: chartColors.red,
                 lineTension: 0,
                 data: data.map((d) => ({x: new Date (d.updatedAt), y: d.dislikeCount } )),
             }],
         };
 
-        const dislikeDatasets = {
+        const chart = new Chart(ctx, { type: "line", data: chartData, options: chartOptions });
+    }
+
+    function initViewChart(data, ctx) {
+        const chartData = {
             datasets: [{
                 label: "Просмотров",
                 fill: false,
-                backgroundColor: "#1664de",
-                borderColor: "#1664de",
+                backgroundColor: chartColors.orange,
+                borderColor: chartColors.orange,
                 lineTension: 0,
                 data: data.map((d) => ({x: new Date (d.updatedAt), y: d.viewCount } )),
             }],
         };
 
-        const ctxLike = (document.getElementById("statisticsLikeChart") as HTMLCanvasElement).getContext("2d");
-        const ctxView = (document.getElementById("statisticsViewChart") as HTMLCanvasElement).getContext("2d");
+        const chart = new Chart(ctx, { type: "line", data: chartData, options: chartOptions });
+    }
 
-        const chartLike = new Chart(ctxLike, { type: "line", data: likeDatasets, options });
-        const chartView = new Chart(ctxView, { type: "line", data: dislikeDatasets, options });
+    $(document).ready(() => {
+        $.getJSON("/api/statistics/" + videoId, (data) => {
+            const ctxRating = (document.getElementById("statisticsLikeChart") as HTMLCanvasElement).getContext("2d");
+            const ctxView = (document.getElementById("statisticsViewChart") as HTMLCanvasElement).getContext("2d");
+            initRatingChart(data, ctxRating);
+            initViewChart(data, ctxView);
+        });
+
     });
-});
+})();

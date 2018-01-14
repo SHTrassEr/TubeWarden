@@ -5,8 +5,19 @@ block content
     h3 Общая статистика по всем видео
     div Вся собранная информация по видео: история изменения количества лайков, дизлайков, просмотров
 
-  p
-    canvas#statisticsLikeChart(height=300)
+  div.row
+    div.col-md-6
+      div.panel.panel-default
+        div.panel-heading По всем видео
+        div.panel-body
+          canvas#summaryTotalVideoChart(height=100)
+
+    div.col-md-6
+      div.panel.panel-default
+        div.panel-heading По нарушениям 
+        div.panel-body
+          canvas#summaryTotalVideoRatingChart(height=100)
+    
 
 
 block script
