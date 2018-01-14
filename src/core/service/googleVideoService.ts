@@ -1,6 +1,6 @@
 import * as google from "googleapis";
 
-import { GoogleChannelInfo, GoogleResultItemList, GoogleVideoInfo } from "../../models/google/ItemInfo";
+import { GoogleChannelInfo, GoogleResultItemList, GoogleVideoInfo } from "../../models/google/itemInfo";
 
 const service: any = google.youtube("v3");
 
