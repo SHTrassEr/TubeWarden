@@ -8,13 +8,24 @@ const itemCnt = 3;
 const atLineEp = 0.000075;
 const maxLineMin = 45;
 
+const p1 =  {
+    x: 0,
+    y: 0,
+};
+
+const p2 =  {
+    x: 0,
+    y: 0,
+};
+
 export default class ViolationService {
 
     public getRequredItemCnt(): number {
         return itemCnt;
     }
 
-    public check(arr: Statistics[], yf: string): boolean {
+    public getAngle(arr: Statistics[], yf: string): number {
+
         if (arr.length === itemCnt && this.getX(arr[2]) !== this.getX(arr[1]) && this.getX(arr[1]) !== this.getX(arr[0])) {
 
             const stl: Statistics = arr[0];
@@ -22,29 +33,38 @@ export default class ViolationService {
             const str: Statistics = arr[2];
 
             if (stl[yf] === stm[yf] && stm[yf] === str[yf]) {
-                return false;
+                return 0;
             }
 
             if (!stl[yf] || !stm[yf] || !str[yf]) {
-                return false;
+                return 0;
             }
 
-            const dx: number = (this.getX(arr[2]) - this.getX(arr[1])) / 1000 / 60;
-            const y: number = (this.getX(arr[2]) - this.getX(arr[0])) *
-                (arr[1][yf] - arr[0][yf]) / (this.getX(arr[1]) - this.getX(arr[0])) + arr[0][yf];
-
-            let e: number = arr[1][yf] * violationFactor;
-            if (e < minViolationValue) {
-                e = minViolationValue;
+            if (stm[yf] < 500 || stl[yf] < 500) {
+                return 0;
             }
 
-            if (Math.abs(arr[2][yf] - y) > e * dx) {
-                return true;
-            }
+            p1.x = (this.getX(stl) - this.getX(stm)) * -1;
+            p1.y = (stl[yf] - stm[yf]) * -1;
+
+            p2.x = this.getX(str) - this.getX(stm);
+            p2.y = str[yf] - stm[yf];
+
+            const cos = ((p1.x * p2.x + p1.y * p2.y) / Math.pow(p1.x * p1.x + p1.y * p1.y, 0.5)) / Math.pow(p2.x * p2.x + p2.y * p2.y, 0.5);
+            const angle = Math.acos(cos);
+            return angle;
         }
 
-        return false;
+        return 0;
+
     }
+
+    public check(arr: Statistics[], yf: string): boolean {
+        const angle = this.getAngle(arr, yf);
+
+        return (angle > 0.0025);
+    }
+
 
     public isPointAtLine(point: Statistics, line: Statistics[], yf: string, ep?: number): boolean {
         if (line.length < 2) {
