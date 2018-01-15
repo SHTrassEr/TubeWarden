@@ -40,6 +40,10 @@ export default class ViolationService {
                 return 0;
             }
 
+            if ((stl[yf] > stm[yf]) || (stm[yf] > str[yf]) ) {
+                return 0;
+            }
+
             if (stm[yf] < 500 || stl[yf] < 500) {
                 return 0;
             }
