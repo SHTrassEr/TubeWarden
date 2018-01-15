@@ -12,6 +12,7 @@ import * as favicon from "serve-favicon";
 
 import * as aboutController from "./controllers/about";
 import * as apiController from "./controllers/api";
+import * as channelController from "./controllers/channel";
 import * as indexController from "./controllers/index";
 import * as summaryController from "./controllers/summary";
 import * as videoController from "./controllers/video";
@@ -47,6 +48,7 @@ app.get("/videos/:pageNum", videosController.getAllVideo);
 app.get("/about", aboutController.about);
 app.get("/summary", summaryController.getSummary);
 app.get("/video/:videoId", videoController.getVideo);
+app.get("/channel/:channelId", channelController.getChannel);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
 app.get("/api/summaryList", cors(), apiController.getSummaryList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);

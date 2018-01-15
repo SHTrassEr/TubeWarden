@@ -14,7 +14,7 @@ block content
         a(href='https://www.youtube.com/watch?v=' + video.videoId )= video.title
       if (video.channel && video.channel.title)
         p Канал: 
-          a(href='https://www.youtube.com/channel/' + video.channel.id )= video.channel.title
+          a(href='/channel/' + video.channel.id )= video.channel.title
       if video.deletedAt
         p 
           i Удалено: 

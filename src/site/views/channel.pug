@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  div.list-header
+    h3 Канал
+    div Список всех видео канала, по по которым собиралась статистика
+
+  div.media
+    div.media-left
+      a(href='https://www.youtube.com/channel/' + channel.id )
+        
+    div.media-body
+      h4.media-heading
+        a(href='https://www.youtube.com/channel/' + channel.id )= channel.title
+      if channel.deletedAt
+        p 
+          i Удалено: 
+            span.date-time-value(data-value=video.deletedAt)
+
+
+  div.list-header
+  div.list-group.list-video-group
+    each video in channel.videos
+      include includes/item.pug   
