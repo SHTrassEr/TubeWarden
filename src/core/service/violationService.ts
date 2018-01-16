@@ -66,9 +66,8 @@ export default class ViolationService {
     public check(arr: Statistics[], yf: string): boolean {
         const angle = this.getAngle(arr, yf);
 
-        return (angle > 0.0025);
+        return (angle > 0.003);
     }
-
 
     public isPointAtLine(point: Statistics, line: Statistics[], yf: string, ep?: number): boolean {
         if (line.length < 2) {
