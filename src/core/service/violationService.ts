@@ -26,11 +26,15 @@ export default class ViolationService {
 
     public getAngle(arr: Statistics[], yf: string): number {
 
-        if (arr.length === itemCnt && this.getX(arr[2]) !== this.getX(arr[1]) && this.getX(arr[1]) !== this.getX(arr[0])) {
+        if (arr.length < itemCnt) {
+            return 0;
+        }
 
-            const stl: Statistics = arr[0];
-            const stm: Statistics = arr[1];
-            const str: Statistics = arr[2];
+        const stl: Statistics = arr[arr.length - 3];
+        const stm: Statistics = arr[arr.length - 2];
+        const str: Statistics = arr[arr.length - 1];
+
+        if (this.getX(str) !== this.getX(stm) && this.getX(stm) !== this.getX(stl)) {
 
             if (stl[yf] === stm[yf] && stm[yf] === str[yf]) {
                 return 0;
