@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/site/server.js",
+    "grabber": "node ./bin/script/backgroundWorker.js",
     "clean": "del-cli bin/",
     "copy": "cpx \"src/**/*.{pug,png}\" bin",
     "build:core": "tsc --project ./src/tsconfig.json",
