@@ -10,6 +10,8 @@ const key = {
     likeViolationCount: "likeViolationCount",
     dislikeViolationCount: "dislikeViolationCount",
     likeAndDislikeViolationCount: "likeAndDislikeViolationCount",
+    deletedVideoCount: "deletedVideoCount",
+    deletedViolationVideoCount: "deletedViolationVideoCount",
 };
 
 const videoCountKey = "videoCount";
@@ -26,6 +28,8 @@ export default class SummaryService {
         await this.updateLikeViolationCount();
         await this.updateDislikeViolationCount();
         await this.updateLikeAndDislikeViolationCount();
+        await this.updateDeletedCount();
+        await this.updateDeletedViolationVideoCount();
     }
 
     public async increaseVideoCount() {
@@ -69,12 +73,24 @@ export default class SummaryService {
         await Summary.update({value: videoCount}, {where: {id: key.violationVideoCount}});
     }
 
+    public async updateDeletedCount() {
+        const videoCount = await Video.count({where: {deleted: true }});
+        await Summary.update({value: videoCount}, {where: {id: key.deletedVideoCount}});
+    }
+
+    public async updateDeletedViolationVideoCount() {
+        const videoCount = await Video.count({where: {deleted: true, lastViolationAt: {[Op.ne]: null} }});
+        await Summary.update({value: videoCount}, {where: {id: key.deletedViolationVideoCount}});
+    }
+
     public async initTable() {
         await Summary.findOrCreate({where: { id: key.videoCount }});
         await Summary.findOrCreate({where: { id: key.violationVideoCount }});
         await Summary.findOrCreate({where: { id: key.likeViolationCount }});
         await Summary.findOrCreate({where: { id: key.dislikeViolationCount }});
         await Summary.findOrCreate({where: { id: key.likeAndDislikeViolationCount }});
+        await Summary.findOrCreate({where: { id: key.deletedVideoCount }});
+        await Summary.findOrCreate({where: { id: key.deletedViolationVideoCount }});
     }
 
     protected async getValue(id: string): Promise<number> {
