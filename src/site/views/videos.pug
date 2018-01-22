@@ -3,7 +3,15 @@ extends layout
 block content
   div.list-header
     h3 Все видео
-    div Все видео Youtube по которым собиралась статистика
+    p Все видео Youtube по которым собиралась статистика
+    
+    div.btn-group
+      each filter in filterList
+        if (filter.url == currentFilter.url)
+          a.btn.btn-default.active(type="button" href=filter.url)=filter.title
+        else 
+          a.btn.btn-default(type="button" href=filter.url)=filter.title
+
 
 
   div.list-group.list-video-group
@@ -14,7 +22,7 @@ block content
     ul.pager
       if (pager.previousPage)
         li.previous
-          a(href="/videos/" + pager.previousPage) Назад
+          a(href=currentFilter.url + pager.previousPage) Назад
       if (pager.nextPage)
         li.next
-          a(href="/videos/" + pager.nextPage) Дальше
+          a(href=currentFilter.url + pager.nextPage) Дальше

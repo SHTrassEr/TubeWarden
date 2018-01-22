@@ -27,21 +27,70 @@ function createPager(totalCount: number, currentPage: number, pageSize: number) 
     };
 }
 
-export async function getAllVideo(req: Request, res: Response) {
+function createFilterList() {
+    return [
+        {
+            title: "все",
+            url: "/videos/",
+            getVideoCount: summaryService.getVideoCount.bind(summaryService),
+            where: {},
+        },
+        {
+            title: "накрутка лайков",
+            url: "/videos/like/",
+            getVideoCount: summaryService.getLikeViolationVideoCount.bind(summaryService),
+            where: {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: 0 },
+        },
+        {
+            title: "накрутка дизлайков",
+            url: "/videos/dislike/",
+            getVideoCount: summaryService.getDislikeViolationVideoCount.bind(summaryService),
+            where: {  dislikeViolationCnt: {[Op.gt]: 0}, likeViolationCnt: 0 },
+        },
+        {
+            title: "накрутка лайков и дизлайков",
+            url: "/videos/likedislike/",
+            getVideoCount: summaryService.getLikeAndDislikeViolationVideoCount.bind(summaryService),
+            where: {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: {[Op.gt]: 0}},
+        },
+    ];
+}
 
-    const videoCount = await summaryService.getVideoCount();
-
+async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
+    const videoCount = await currentFilter.getVideoCount();
     const pager = createPager(videoCount, parseInt(req.params.pageNum, 10), PAGE_SIZE);
-
     const videoList = await Video.findAll({
         offset: pager.offset,
         limit: PAGE_SIZE,
         order: [
             ["createdAt", "DESC"],
         ],
-        where: {
-        },
+        where: currentFilter.where,
     });
 
-    res.render("videos", { videoList, pager });
+    res.render("videos", { videoList, pager, filterList, currentFilter });
+}
+
+export async function getAllVideo(req: Request, res: Response) {
+    const filterList = createFilterList();
+    const currentFilter = filterList[0];
+    return getVideoList(req, res, filterList, currentFilter);
+}
+
+export async function getAllLikeViolationVideo(req: Request, res: Response) {
+    const filterList = createFilterList();
+    const currentFilter = filterList[1];
+    return getVideoList(req, res, filterList, currentFilter);
+}
+
+export async function getAllDislikeViolationVideo(req: Request, res: Response) {
+    const filterList = createFilterList();
+    const currentFilter = filterList[2];
+    return getVideoList(req, res, filterList, currentFilter);
+}
+
+export async function getAllLikeAndDislikeViolationVideo(req: Request, res: Response) {
+    const filterList = createFilterList();
+    const currentFilter = filterList[3];
+    return getVideoList(req, res, filterList, currentFilter);
 }

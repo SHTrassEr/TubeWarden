@@ -43,6 +43,12 @@ app.use(compression());
 app.use(cache("2 minutes"));
 
 app.get("/", indexController.index);
+app.get("/videos/like", videosController.getAllLikeViolationVideo);
+app.get("/videos/like/:pageNum", videosController.getAllLikeViolationVideo);
+app.get("/videos/dislike", videosController.getAllDislikeViolationVideo);
+app.get("/videos/dislike/:pageNum", videosController.getAllDislikeViolationVideo);
+app.get("/videos/likedislike", videosController.getAllLikeAndDislikeViolationVideo);
+app.get("/videos/likedislike/:pageNum", videosController.getAllLikeAndDislikeViolationVideo);
 app.get("/videos", videosController.getAllVideo);
 app.get("/videos/:pageNum", videosController.getAllVideo);
 app.get("/about", aboutController.about);

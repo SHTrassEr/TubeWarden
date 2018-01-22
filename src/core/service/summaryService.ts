@@ -48,6 +48,18 @@ export default class SummaryService {
         return await this.getValue(key.violationVideoCount);
     }
 
+    public async getLikeViolationVideoCount(): Promise<number> {
+        return await this.getValue(key.likeViolationCount);
+    }
+
+    public async getDislikeViolationVideoCount(): Promise<number> {
+        return await this.getValue(key.dislikeViolationCount);
+    }
+
+    public async getLikeAndDislikeViolationVideoCount(): Promise<number> {
+        return await this.getValue(key.likeAndDislikeViolationCount);
+    }
+
     public async updateVideoCount() {
         const videoCount = await Video.count();
         await Summary.update({value: videoCount}, {where: {id: key.videoCount}});
