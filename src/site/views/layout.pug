@@ -29,8 +29,14 @@ html
               a(href="/videos") Все видео
             li
               a(href="/about") О проекте
-            li
-              a(href="https://chrome.google.com/webstore/detail/tube-warden/jnphebeelkkkdkebpnobcdbmjggdaaif") Плагин
+            li.dropdown
+              a#dropDownMenuPlugins.dropdown-toggle(role="button" data-toggle="dropdown"  aria-haspopup="true" aria-expanded="true") Плагины
+                span.caret
+              ul.dropdown-menu(aria-labelledby="dropDownMenuPlugins")
+                li
+                  a(href="https://chrome.google.com/webstore/detail/tube-warden/jnphebeelkkkdkebpnobcdbmjggdaaif") Chrome
+                li
+                  a(href="https://addons.mozilla.org/ru/firefox/addon/tube-warden/") Firefox
             li
               a(href="https://github.com/SHTrassEr/TubeWarden") GitHub
 
