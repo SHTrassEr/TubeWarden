@@ -8,6 +8,8 @@ const itemCnt = 3;
 const atLineEp = 0.000075;
 const maxLineMin = 45;
 
+const maxLineCheckMin = 60;
+
 const p1 =  {
     x: 0,
     y: 0,
@@ -54,6 +56,10 @@ export default class ViolationService {
             p2.x = this.getX(str) - this.getX(stm);
             p2.y = str[yf] - stm[yf];
 
+            if ((p1.x > maxLineCheckMin * 60  || (p2.x > maxLineCheckMin * 60 ))) {
+                return 0;
+            }
+
             const cos = ((p1.x * p2.x + p1.y * p2.y) / Math.pow(p1.x * p1.x + p1.y * p1.y, 0.5)) / Math.pow(p2.x * p2.x + p2.y * p2.y, 0.5);
             const angle = Math.acos(cos);
             return angle;
@@ -71,10 +77,16 @@ export default class ViolationService {
         const r = str[yf];
 
         if (m < 400 && r > 800) {
-            return (angle > 0.08);
+            return (angle > 1);
         }
 
-        return (angle > 0.003);
+        if (angle > 0.75) {
+            return true;
+        }
+
+        return false;
+
+        // return (angle > 0.7);
     }
 
     public isPointAtLine(point: Statistics, line: Statistics[], yf: string, ep?: number): boolean {
@@ -98,7 +110,7 @@ export default class ViolationService {
             return false;
         }
 
-        const dx: number = (this.getX(stm) - this.getX(stl)) / 1000 / 60;
+        const dx: number = (this.getX(stm) - this.getX(stl)) / 60;
         if (dx > maxLineMin) {
             return false;
         }
@@ -118,7 +130,7 @@ export default class ViolationService {
     }
 
     protected getX(st: Statistics): number {
-        return st.updatedAt.getTime();
+        return ((st.updatedAt.getTime() / 1000) );
     }
 
 }
