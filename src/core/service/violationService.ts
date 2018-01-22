@@ -77,10 +77,10 @@ export default class ViolationService {
         const r = str[yf];
 
         if (m < 400 && r > 800) {
-            return (angle > 1);
+            return (angle > 1.8);
         }
 
-        if (angle > 0.75) {
+        if (angle > 0.87) {
             return true;
         }
 
