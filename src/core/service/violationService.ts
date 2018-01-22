@@ -80,7 +80,7 @@ export default class ViolationService {
             return (angle > 1.7);
         }
 
-        if (angle > 1) {
+        if (angle > 1.2) {
             return true;
         }
 
