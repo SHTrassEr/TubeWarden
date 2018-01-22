@@ -48,10 +48,6 @@ export default class ViolationService {
                 return 0;
             }
 
-            if (stm[yf] < 500 || stl[yf] < 500) {
-                return 0;
-            }
-
             p1.x = (this.getX(stl) - this.getX(stm)) * -1;
             p1.y = (stl[yf] - stm[yf]) * -1;
 
@@ -69,6 +65,14 @@ export default class ViolationService {
 
     public check(arr: Statistics[], yf: string): boolean {
         const angle = this.getAngle(arr, yf);
+        const stm: Statistics = arr[arr.length - 2];
+        const str: Statistics = arr[arr.length - 1];
+        const m = stm[yf];
+        const r = str[yf];
+
+        if (m < 400 && r > 800) {
+            return (angle > 0.08);
+        }
 
         return (angle > 0.003);
     }
