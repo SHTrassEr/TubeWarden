@@ -40,6 +40,12 @@ export default class Video extends Model<Video> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     public dislikeViolationCnt: number;
 
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    public likeStrangeCnt: number;
+
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    public dislikeStrangeCnt: number;
+
     @Column({ defaultValue: false })
     public deleted: boolean;
 

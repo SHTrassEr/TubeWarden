@@ -1,71 +1,72 @@
-import { Promise } from "bluebird";
+
 import ViolationService from "../core/service/violationService";
 import Statistics from "../models/db/statistics";
 import Video from "../models/db/video";
+import VideoViolation from "../models/db/videoViolation";
 import sequelize from "../sequelize";
 
 const violationService: ViolationService = new ViolationService();
 
-function updateVideoViolation(video: Video): Promise {
-    return Statistics.findAll({
+async function updateVideoViolation(video: Video) {
+
+    const statisticsList = await Statistics.findAll({
         where: {
             videoId: video.videoId,
         },
         order: ["createdAt"],
-    })
-    .then((statisticsList: Statistics[]) => {
-        const arr: Statistics[] = [null, null, null];
+    });
 
-        let likeViolationCnt: number = 0;
-        let dislikeViolationCnt: number = 0;
-        let lastViolationAt: Date = null;
-        let lastSt: Statistics;
+    const [videoViolation] = await VideoViolation.findOrCreate({ where: { videoId: video.videoId }});
+    const arr: Statistics[] = [null, null, null];
 
-        for (const statistics of statisticsList) {
-            lastSt = statistics;
+    videoViolation.maxAnglePositiveLike = 0;
+    videoViolation.maxAngleNegativeLike = 0;
+    videoViolation.sumAnglePositiveLike = 0;
+    videoViolation.sumAngleNegativeLike = 0;
+    videoViolation.maxAnglePositiveDislike = 0;
+    videoViolation.maxAngleNegativeDislike = 0;
+    videoViolation.sumAnglePositiveDislike = 0;
+    videoViolation.sumAngleNegativeDislike = 0;
 
-            arr[0] = arr[1];
-            arr[1] = arr[2];
-            arr[2] = statistics;
+    let lastViolationAt: Date = null;
+    let lastSt: Statistics;
 
-            if (arr[0] != null) {
-                if (violationService.check(arr, "likeCount")) {
-                    likeViolationCnt ++;
-                    lastViolationAt = arr[2].createdAt;
-                }
+    for (const statistics of statisticsList) {
+        lastSt = statistics;
 
-                if (violationService.check(arr, "dislikeCount")) {
-                    dislikeViolationCnt ++;
-                    lastViolationAt = arr[2].createdAt;
-                }
+        arr[0] = arr[1];
+        arr[1] = arr[2];
+        arr[2] = statistics;
+
+        if (arr[0] != null) {
+            if (violationService.updateViolation(arr, videoViolation)) {
+                lastViolationAt = statistics.updatedAt;
             }
         }
+    }
 
-        if (lastSt) {
+    await videoViolation.save();
 
-            return Video.update({
-                likeViolationCnt,
-                dislikeViolationCnt,
-                 lastViolationAt,
-                likeCount: lastSt.likeCount,
-                dislikeCount: lastSt.dislikeCount,
-                viewCount: lastSt.viewCount,
-                }, {
-                    where: { videoId: video.videoId },
-                },
-            );
-        }
+    if (lastSt) {
 
-    });
+        violationService.updateVideo(video, videoViolation);
+        video.likeCount = lastSt.likeCount;
+        video.dislikeCount = lastSt.dislikeCount;
+        video.viewCount = lastSt.viewCount;
+        video.lastViolationAt = lastViolationAt;
+        await video.save();
+
+    }
+
 }
 
 sequelize.authenticate()
-.then(() => {
-    return Video.findAll();
-})
-.then((videoList) => {
-    return Promise.each(videoList, (video) => updateVideoViolation(video));
-})
-.then(() => {
+.then(async () => {
+    // const videoList = await Video.findAll({where: {videoId: "eSN6nkEbwCE"}});
+    const videoList = await Video.findAll();
+    for (const video of videoList) {
+        await updateVideoViolation(video);
+    }
+
     sequelize.close();
 });

@@ -81,7 +81,7 @@ export default class SummaryService {
     }
 
     public async updateViolationCount() {
-        const videoCount = await Video.count({where: {lastViolationAt: {[Op.ne]: null}}});
+        const videoCount = await Video.count({where: {[Op.or]: [{likeViolationCnt: {[Op.gt]: 0}}, {dislikeViolationCnt: {[Op.gt]: 0}}]}});
         await Summary.update({value: videoCount}, {where: {id: key.violationVideoCount}});
     }
 
@@ -91,7 +91,9 @@ export default class SummaryService {
     }
 
     public async updateDeletedViolationVideoCount() {
-        const videoCount = await Video.count({where: {deleted: true, lastViolationAt: {[Op.ne]: null} }});
+        const videoCount = await Video.count({where: {
+            deleted: true,
+            [Op.or]: [{likeViolationCnt: {[Op.gt]: 0}}, {dislikeViolationCnt: {[Op.gt]: 0}}]}});
         await Summary.update({value: videoCount}, {where: {id: key.deletedViolationVideoCount}});
     }
 

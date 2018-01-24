@@ -4,6 +4,7 @@ import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/item
 
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
+import VideoViolation from "../../models/db/videoViolation";
 
 import GoogleVideoService from "../service/googleVideoService";
 import SummaryService from "../service/summaryService";
@@ -85,19 +86,12 @@ export default class StatisticsGrabber {
         if (statisticsList && statisticsList.length > 0) {
             video.statisticsUpdatedAt = new Date();
 
+            const [videoViolation] = await VideoViolation.findOrCreate({ where: { videoId: video.videoId }});
             const lastSt: Statistics = statisticsList[statisticsList.length - 1];
 
-            let violated: boolean = false;
+            const violated = this.violationService.updateViolation(statisticsList, videoViolation);
 
-            if (this.violationService.check(statisticsList, "likeCount")) {
-                video.likeViolationCnt ++;
-                violated = true;
-            }
-
-            if (this.violationService.check(statisticsList, "dislikeCount")) {
-                video.dislikeViolationCnt ++;
-                violated = true;
-            }
+            this.violationService.updateVideo(video, videoViolation);
 
             if (violated) {
                 video.lastViolationAt = new Date();

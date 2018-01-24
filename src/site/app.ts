@@ -49,6 +49,8 @@ app.get("/videos/dislike", videosController.getAllDislikeViolationVideo);
 app.get("/videos/dislike/:pageNum", videosController.getAllDislikeViolationVideo);
 app.get("/videos/likedislike", videosController.getAllLikeAndDislikeViolationVideo);
 app.get("/videos/likedislike/:pageNum", videosController.getAllLikeAndDislikeViolationVideo);
+app.get("/videos/strange", videosController.getAllStrangeVideo);
+app.get("/videos/strange/:pageNum", videosController.getAllStrangeVideo);
 app.get("/videos", videosController.getAllVideo);
 app.get("/videos/:pageNum", videosController.getAllVideo);
 app.get("/about", aboutController.about);

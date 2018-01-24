@@ -53,6 +53,12 @@ function createFilterList() {
             getVideoCount: summaryService.getLikeAndDislikeViolationVideoCount.bind(summaryService),
             where: {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: {[Op.gt]: 0}},
         },
+        {
+            title: "чудеса",
+            url: "/videos/strange/",
+            getVideoCount: summaryService.getLikeAndDislikeViolationVideoCount.bind(summaryService),
+            where: { [Op.or]: [{likeStrangeCnt: {[Op.gt]: 0}}, {dislikeStrangeCnt: {[Op.gt]: 0}}] },
+        },
     ];
 }
 
@@ -92,5 +98,11 @@ export async function getAllDislikeViolationVideo(req: Request, res: Response) {
 export async function getAllLikeAndDislikeViolationVideo(req: Request, res: Response) {
     const filterList = createFilterList();
     const currentFilter = filterList[3];
+    return getVideoList(req, res, filterList, currentFilter);
+}
+
+export async function getAllStrangeVideo(req: Request, res: Response) {
+    const filterList = createFilterList();
+    const currentFilter = filterList[4];
     return getVideoList(req, res, filterList, currentFilter);
 }
