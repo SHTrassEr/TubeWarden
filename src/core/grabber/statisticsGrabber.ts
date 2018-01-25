@@ -102,7 +102,8 @@ export default class StatisticsGrabber {
             video.dislikeCount = lastSt.dislikeCount;
             video.viewCount = lastSt.viewCount;
             await videoViolation.save();
-            return video.save();
+            await video.save();
+            return video;
         }
     }
 

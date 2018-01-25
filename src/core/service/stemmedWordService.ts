@@ -42,9 +42,8 @@ export default class StemmedWordService {
 
                 for (const sw of swList) {
                     if (sw && sw.length > 2) {
-                        const w = sw.toLowerCase();
-                        if (!stemmedWordTitleSet.has(w)) {
-                            stemmedWordTitleSet.add(w);
+                        if (!stemmedWordTitleSet.has(sw)) {
+                            stemmedWordTitleSet.add(sw);
                         }
                     }
                 }
@@ -60,30 +59,8 @@ export default class StemmedWordService {
     }
 
     protected getWordList(title: string) {
-        const wordList = title.split(/[“”—\@\/\*\]\[\{\}\)\(\?\!\#\:'" ,«»\.\|-]+/);
-        return  wordList.map((w) => this.getWord(w));
-    }
-
-    protected getWord(word: string) {
-        if (word.length > 4) {
-            if (word.endsWith("а") || word.endsWith("у")) {
-                return word.substr(0, word.length - 1);
-            }
-        }
-
-        if (word.length > 5) {
-            if (word.endsWith("ым") || word.endsWith("ый")) {
-                return word.substr(0, word.length - 2);
-            }
-        }
-
-        if (word.length > 6) {
-            if (word.endsWith("ого")) {
-                return word.substr(0, word.length - 2);
-            }
-        }
-
-        return word;
+        title = title.toLowerCase();
+        return title.split(/[“”—\@\/\*\]\[\{\}\)\(\?\!\#\:'" ,«»\.\|-]+/);
     }
 
     protected async getOrCreateStemmedWordListByStemmedWords(titleList: string[]): Promise<StemmedWord[]> {
