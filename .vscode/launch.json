@@ -52,6 +52,12 @@
             "request": "launch",
             "name": "UpdateSummary",
             "program": "${workspaceFolder}/bin/script\\UpdateSummary.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "updateVideoStemmedWord",
+            "program": "${workspaceFolder}/bin/script\\updateVideoStemmedWord.js"
         }
 
     ]

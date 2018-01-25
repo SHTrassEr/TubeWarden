@@ -1,7 +1,9 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 
 import Channel from "./channel";
+import StemmedWord from "./stemmedWord";
 import Tag from "./tag";
+import VideoStemmedWord from "./videoStemmedWord";
 import VideoTag from "./videoTag";
 
 @Table( {
@@ -73,6 +75,9 @@ export default class Video extends Model<Video> {
 
     @BelongsToMany(() => Tag, () => VideoTag, "videoId")
     public tags: Tag[];
+
+    @BelongsToMany(() => StemmedWord, () => VideoStemmedWord, "videoId")
+    public stemmedWords: StemmedWord[];
 
     public isViolated(): boolean {
         if (this.lastViolationAt) {

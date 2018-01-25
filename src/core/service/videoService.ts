@@ -3,6 +3,7 @@ import { GoogleVideoInfo } from "../../models/google/itemInfo";
 import Video from "../../models/db/video";
 import ChannelService from "./channelService";
 import GoogleVideoService from "./googleVideoService";
+import StemmedWordService from "./stemmedWordService";
 import SummaryService from "./summaryService";
 import TagService from "./tagService";
 
@@ -11,17 +12,20 @@ export default class VideoService {
     protected channelService: ChannelService;
     protected tagService: TagService;
     protected summaryService: SummaryService;
+    protected stemmedWordService: StemmedWordService;
 
     constructor() {
         this.channelService = new ChannelService();
         this.tagService = new TagService();
         this.summaryService = new SummaryService();
+        this.stemmedWordService = new StemmedWordService();
     }
 
     public async updateVideo(video: Video, videoInfo: GoogleVideoInfo) {
         video.title = videoInfo.snippet.title;
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         await this.setVideoTagTitleList(video, videoInfo.snippet.tags);
+        await this.stemmedWordService.setVideoStemmedWordList(video);
 
         if (video.changed()) {
             return video.save();
@@ -48,7 +52,7 @@ export default class VideoService {
 
     protected async setVideoTagTitleList(video: Video, tagTitleList: string[]): Promise<Video> {
         const tagList = await this.tagService.getOrCreateTagList(tagTitleList);
-        return  video.$set("tags", tagList);
+        return await video.$set("tags", tagList);
     }
 
     protected async updateVideoChannelId(video: Video, channelId: string): Promise<any> {

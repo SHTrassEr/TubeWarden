@@ -41,6 +41,7 @@
     "sequelize": "^4.30.2",
     "sequelize-typescript": "^0.6.2",
     "serve-favicon": "^2.4.5",
+    "snowball-stemmer.jsx": "^0.2.3",
     "typescript": "^2.6.2"
   },
   "devDependencies": {
