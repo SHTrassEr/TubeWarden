@@ -23,11 +23,24 @@ export default class ChannelService {
             channel.title = "";
         }
 
+        if (channelInfo.statistics) {
+            if (channelInfo.statistics.videoCount) {
+                channel.videoCount = channelInfo.statistics.videoCount;
+            }
+
+            if (channelInfo.statistics.subscriberCount) {
+                channel.subscriberCount = channelInfo.statistics.subscriberCount;
+            }
+
+            if (channelInfo.snippet.thumbnails && channelInfo.snippet.thumbnails.default) {
+                channel.thumbnail = channelInfo.snippet.thumbnails.default.url;
+            }
+        }
+
         if (channel.changed()) {
             return channel.save();
         }
     }
-
 
     public async setDeletedChannelList(deletedChannelIdList: string[]) {
         if (deletedChannelIdList.length > 0) {

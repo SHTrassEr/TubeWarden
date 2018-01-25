@@ -6,6 +6,16 @@ export class GoogleVideoStatistics {
 }
 
 export class GoogleChannelStatistics {
+    public videoCount: number;
+    public subscriberCount: number;
+}
+
+export class GoogleChannelStatisticsThumbnails {
+    public default: GoogleChannelStatisticsThumbnail;
+}
+
+export class GoogleChannelStatisticsThumbnail {
+    public url: string;
 }
 
 export class GoogleVideoSnippet {
@@ -18,6 +28,7 @@ export class GoogleVideoSnippet {
 export class GoogleChannelSnippet {
     public publishedAt: Date;
     public title: string;
+    public thumbnails: GoogleChannelStatisticsThumbnails;
 }
 
 export class GoogleVideoInfo {

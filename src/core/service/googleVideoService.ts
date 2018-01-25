@@ -61,9 +61,9 @@ export default class GoogleVideoService {
         return new Promise((resolve, reject) => {
             service.channels.list({
                 auth,
-                part: "snippet",
+                part: "snippet,statistics",
                 id: channelIdList.join(),
-                fields: "items(id,snippet(title))",
+                fields: "items(id,snippet(thumbnails/default,title),statistics(subscriberCount,videoCount))",
             }, (err, data) => {
                 if (err) {
                     reject(err);

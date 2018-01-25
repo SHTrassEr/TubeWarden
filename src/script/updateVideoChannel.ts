@@ -1,28 +1,40 @@
 import { Op } from "sequelize";
+
+import Channel from "../models/db/channel";
+import Video from "../models/db/video";
+
 import Config from "../config";
 import ChannelGrabber from "../core/grabber/channelGrabber";
 import VideoGrabber from "../core/grabber/videoGrabber";
-import Video from "../models/db/video";
 import sequelize from "../sequelize";
 
 import GoogleVideoService from "../core/service/googleVideoService";
+
+import createPager from "../utils/pager";
 
 const googleVideoService = new GoogleVideoService(Config.Google.key);
 const videoGrabber = new VideoGrabber(googleVideoService);
 const channelGrabber = new ChannelGrabber(googleVideoService);
 
 async function process(): Promise<any> {
-    let cnt = 0;
+
+    const channelCnt = await Channel.count();
+    const pageSize = 50;
+    let currentPage = 1;
 
     do {
-        cnt = await videoGrabber.processEmptyChannelId(Config.Google.maxResults);
-    } while (cnt > 0);
+        const pager = createPager(channelCnt, currentPage, pageSize);
+        const channelList = await Channel.findAll({
+            offset: pager.offset,
+            limit: pageSize,
+            order: [
+                ["createdAt", "DESC"],
+            ],
+        });
 
-    cnt = 0;
-
-    do {
-        cnt = await channelGrabber.processEmptyTitle(Config.Google.maxResults);
-    } while (cnt > 0);
+        await channelGrabber.update(channelList);
+        currentPage = pager.previousPage;
+    } while (currentPage);
 }
 
 sequelize.authenticate()

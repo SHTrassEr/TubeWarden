@@ -8,6 +8,8 @@ block content
   div.media
     div.media-left
       a(href='https://www.youtube.com/channel/' + channel.id )
+      if channel.thumbnail
+        img.card-img-left(src=channel.thumbnail)
         
     div.media-body
       h4.media-heading

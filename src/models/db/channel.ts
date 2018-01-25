@@ -30,6 +30,9 @@ export default class Channel extends Model<Channel> {
     public likeViolationCount: number;
 
     @Column
+    public thumbnail: string;
+
+    @Column
     public dislikeViolationCount: number;
 
     @Column({ defaultValue: false })

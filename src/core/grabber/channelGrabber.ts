@@ -37,13 +37,7 @@ export default class ChannelGrabber {
         return channelList.length;
     }
 
-    protected createChannelInfoHash(infoList: GoogleChannelInfo[]): Map<string, GoogleChannelInfo> {
-        return infoList.reduce((map, obj) => {
-            return map.set(obj.id, obj);
-        }, new Map<string, GoogleChannelInfo>());
-    }
-
-    protected async update(channelList: Channel[]) {
+    public async update(channelList: Channel[]) {
         const channelIdList = channelList.map((c) => c.id);
         const channelInfoList = await this.googleVideoService.getChannelInfo(channelIdList);
         const channelInfoHash = this.createChannelInfoHash(channelInfoList);
@@ -58,4 +52,11 @@ export default class ChannelGrabber {
             await this.channelService.setDeletedChannelList(deletedChannelIdList);
         }
     }
+
+    protected createChannelInfoHash(infoList: GoogleChannelInfo[]): Map<string, GoogleChannelInfo> {
+        return infoList.reduce((map, obj) => {
+            return map.set(obj.id, obj);
+        }, new Map<string, GoogleChannelInfo>());
+    }
+
 }
