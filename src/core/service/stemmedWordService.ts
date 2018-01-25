@@ -1,4 +1,3 @@
-import * as snowballStemmer from "snowball-stemmer.jsx/dest/russian-stemmer.common.js";
 
 import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
@@ -6,7 +5,7 @@ import StemmedWord from "../../models/db/stemmedWord";
 import Tag from "../../models/db/tag";
 import Video from "../../models/db/video";
 
-const stemmer = new snowballStemmer.RussianStemmer();
+import stemString from "../../utils/stemmer";
 
 export default class StemmedWordService {
 
@@ -37,14 +36,11 @@ export default class StemmedWordService {
         for (const title of titleList) {
             if (title) {
 
-                const wordList = this.getWordList(title);
-                const swList = stemmer.stemWords(wordList);
+                const swList = stemString(title);
 
                 for (const sw of swList) {
-                    if (sw && sw.length > 2) {
-                        if (!stemmedWordTitleSet.has(sw)) {
-                            stemmedWordTitleSet.add(sw);
-                        }
+                    if (!stemmedWordTitleSet.has(sw)) {
+                        stemmedWordTitleSet.add(sw);
                     }
                 }
             }
@@ -56,11 +52,6 @@ export default class StemmedWordService {
         }
 
         return [];
-    }
-
-    protected getWordList(title: string) {
-        title = title.toLowerCase();
-        return title.split(/[“”—\@\/\*\]\[\{\}\)\(\?\!\#\:'" ,«»\.\|-]+/);
     }
 
     protected async getOrCreateStemmedWordListByStemmedWords(titleList: string[]): Promise<StemmedWord[]> {

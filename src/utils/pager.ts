@@ -11,6 +11,7 @@ export default function createPager(totalCount: number, currentPage: number, pag
     }
 
     return {
+        pageSize,
         currentPage,
         offset,
         nextPage: (currentPage > 1) ? (currentPage - 1) : null,
