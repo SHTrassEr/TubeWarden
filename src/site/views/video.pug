@@ -11,10 +11,17 @@ block content
         img.card-img-left(src='https://img.youtube.com/vi/' + video.videoId + '/2.jpg')
     div.media-body
       h4.media-heading
-        a(href='https://www.youtube.com/watch?v=' + video.videoId )= video.title
+        p
+          a(href='https://www.youtube.com/watch?v=' + video.videoId )= video.title
       if (video.channel && video.channel.title)
         p Канал: 
           a(href='/channel/' + video.channel.id )= video.channel.title
+        if video.tags && video.tags.length
+          p теги: 
+            small
+              each tag, tagIndex in video.tags
+                a.tag(href="/videos?s=" + tag.title)= tag.title
+              
       if video.deletedAt
         p 
           i Удалено: 

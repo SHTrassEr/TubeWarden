@@ -29,8 +29,12 @@ block content
 
 
   div.list-group.list-video-group
-    each video in videoList
-        include includes/item.pug
+    if videoList.length
+      each video in videoList
+          include includes/item.pug
+    else
+      center 
+        p результатов не найдено
 
   nav
     ul.pager
