@@ -66,7 +66,7 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
         pager = createPager(videoCount, parseInt(req.params.pageNum, 10), PAGE_SIZE);
     } else {
         pager = {
-            pageSize: null,
+            pageSize: 100,
             currentPage: 1,
             offset: null,
             nextPage: null,
@@ -101,6 +101,7 @@ function initKeywordFilter(filter: string) {
     const where = {title: sw[0]};
     return [{
         model: StemmedWord,
+        duplicating: false,
         where,
     }];
 }
