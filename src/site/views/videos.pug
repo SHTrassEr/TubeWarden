@@ -10,19 +10,21 @@ block content
     div.col-lg-12
       form(action=currentFilter.url method="GET")
         div.input-group
-          input.form-control(type="text" name="s" placeholder="поиск по ключевым словам" value=searchString)
+          input.form-control(type="text" name="s" placeholder="поиск по ключевому слову" alt="Поиск производится только по первому введенному слову" value=searchString)
           span.input-group-btn
             input.btn.btn-default(type="submit" value="Искать")
+
   
   div.row
     div.col-lg-12
-      p
-        div.btn-group
-          each filter in filterList
-            if (filter.url == currentFilter.url)
-              a.btn.btn-default.active(type="button" href=filter.url + ((searchString)? "?s=" + searchString : ""))=filter.title
-            else 
-              a.btn.btn-default(type="button" href=filter.url + ((searchString)? "?s=" + searchString : ""))=filter.title
+      center
+        p
+          div.btn-group
+            each filter in filterList
+              if (filter.url == currentFilter.url)
+                a.btn.btn-default.active(type="button" href=filter.url + ((searchString)? "?s=" + searchString : ""))=filter.title
+              else 
+                a.btn.btn-default(type="button" href=filter.url + ((searchString)? "?s=" + searchString : ""))=filter.title
 
 
 

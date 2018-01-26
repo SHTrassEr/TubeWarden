@@ -46,10 +46,19 @@ function createFilterList() {
     ];
 }
 
+function getSearchString(req: Request) {
+    const searchString = req.param("s", "");
+    if (searchString) {
+        return searchString.split(" ")[0];
+    }
+
+    return "";
+}
+
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
     const videoCount = await currentFilter.getVideoCount();
 
-    const searchString = req.param("s", "");
+    const searchString = getSearchString(req);
     const include = initKeywordFilter(searchString);
 
     let pager;
@@ -89,7 +98,7 @@ function initKeywordFilter(filter: string) {
         return null;
     }
 
-    const where = {title: sw};
+    const where = {title: sw[0]};
     return [{
         model: StemmedWord,
         where,

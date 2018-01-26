@@ -21,6 +21,7 @@ export async function getStatisticsByVideo(req: Request, res: Response) {
 
 export async function getTrendsVideoList(req: Request, res: Response) {
     const videoList = await Video.findAll({
+        attributes: ["videoId", "likeCount", "dislikeCount", "viewCount", "likeViolationCnt", "dislikeViolationCnt"],
         limit: 100 ,
         order: [
             ["trendsAt", "DESC"],
