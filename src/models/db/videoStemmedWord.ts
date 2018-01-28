@@ -4,6 +4,8 @@ import Video from "./video";
 
 @Table({
     tableName: "video_stemmed_word",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_ci",
     timestamps: false,
 })
 export default class VideoStemmedWord extends Model<VideoStemmedWord> {

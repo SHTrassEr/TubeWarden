@@ -1,24 +1,30 @@
-import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasOne, Model, Table } from "sequelize-typescript";
 
 import Channel from "./channel";
 import StemmedWord from "./stemmedWord";
 import Tag from "./tag";
 import VideoStemmedWord from "./videoStemmedWord";
 import VideoTag from "./videoTag";
+import VideoViolationDislike from "./videoViolationDislike";
+import VideoViolationLike from "./videoViolationLike";
 
 @Table( {
     tableName: "videos",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_ci",
     timestamps: true,
     indexes: [
-        { unique: false, fields: ["deleted", "nextStatisticsUpdateAt"] },
-        { unique: false, fields: ["trendsAt"] },
+        { unique: false, fields: ["nextStatisticsUpdateAt"] },
+        { unique: false, fields: ["trendsAt", "createdAt"] },
         { unique: false, fields: ["createdAt"] },
-        { unique: false, fields: ["channelId"] },
+        { unique: false, fields: ["channelId", "createdAt"] },
+        { unique: false, fields: ["violationIndexLike", "createdAt"] },
+        { unique: false, fields: ["violationIndexDislike", "createdAt"] },
     ],
 })
 export default class Video extends Model<Video> {
 
-    @Column({ primaryKey: true })
+    @Column({ primaryKey: true, allowNull: false })
     public videoId: string;
 
     @Column(DataType.TEXT)
@@ -37,25 +43,16 @@ export default class Video extends Model<Video> {
     public viewCount: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    public likeViolationCnt: number;
+    public violationIndexLike: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    public dislikeViolationCnt: number;
-
-    @Column({type: DataType.INTEGER, defaultValue: 0})
-    public likeStrangeCnt: number;
-
-    @Column({type: DataType.INTEGER, defaultValue: 0})
-    public dislikeStrangeCnt: number;
+    public violationIndexDislike: number;
 
     @Column({ defaultValue: false })
     public deleted: boolean;
 
     @Column(DataType.DATE)
     public deletedAt: Date;
-
-    @Column(DataType.DATE)
-    public lastViolationAt: Date;
 
     @Column(DataType.DATE)
     public statisticsUpdatedAt: Date;
@@ -70,6 +67,12 @@ export default class Video extends Model<Video> {
     @Column
     public channelId: string;
 
+    @HasOne(() => VideoViolationLike)
+    public violationLike: VideoViolationLike;
+
+    @HasOne(() => VideoViolationDislike)
+    public violationDislike: VideoViolationDislike;
+
     @BelongsTo(() => Channel, "channelId")
     public channel: Channel;
 
@@ -78,12 +81,4 @@ export default class Video extends Model<Video> {
 
     @BelongsToMany(() => StemmedWord, () => VideoStemmedWord, "videoId")
     public stemmedWords: StemmedWord[];
-
-    public isViolated(): boolean {
-        if (this.lastViolationAt) {
-            return true;
-        }
-
-        return false;
-    }
 }

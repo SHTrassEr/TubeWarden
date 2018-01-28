@@ -1,6 +1,6 @@
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
-import VideoViolation from "../../models/db/videoViolation";
+import IVideoViolation from "../../models/iVideoViolation";
 
 const violationFactor = 0.015;
 const minViolationValue = 200;
@@ -18,74 +18,44 @@ export default class ViolationService {
         return itemCnt;
     }
 
-    public updateViolation(arr: Statistics[], videoViolation: VideoViolation): boolean {
-        const bLike = this.updateViolationLike(arr, videoViolation);
-        const bDislike = this.updateViolationDislike(arr, videoViolation);
-        return bLike || bDislike;
-    }
+    public updateViolation(arr: Statistics[], fieldName: string, videoViolation: IVideoViolation): boolean {
+        const [positiveAngle, negativeAngle] = this.getAngle(arr, fieldName);
 
-    public updateVideo(video: Video, videoViolation: VideoViolation) {
-        video.likeViolationCnt  = 0;
-        if (videoViolation.maxAnglePositiveLike > 1.2) {
-            video.likeViolationCnt += 1;
-        }
-        if (videoViolation.sumAnglePositiveLike > 4) {
-            video.likeViolationCnt += 1;
-        }
-        if (videoViolation.sumAnglePositiveLike > 10) {
-            video.likeViolationCnt += 1;
-        }
-
-        video.dislikeViolationCnt = 0;
-        if (videoViolation.maxAnglePositiveDislike > 1.2) {
-            video.dislikeViolationCnt += 1;
-        }
-        if (videoViolation.sumAnglePositiveDislike > 4) {
-            video.dislikeViolationCnt += 1;
-        }
-        if (videoViolation.sumAnglePositiveDislike > 10) {
-            video.dislikeViolationCnt += 1;
-        }
-
-        if (videoViolation.sumAngleNegativeLike > 3 || videoViolation.maxAngleNegativeLike > 1.6) {
-            video.likeStrangeCnt = 1;
-            video.likeViolationCnt = 0;
-        }
-
-        if (videoViolation.sumAngleNegativeDislike > 3 || videoViolation.maxAngleNegativeDislike > 1.6) {
-            video.dislikeStrangeCnt = 1;
-            video.dislikeViolationCnt = 0;
-        }
-    }
-
-    public updateViolationLike(arr: Statistics[], videoViolation: VideoViolation): boolean {
-        const [positiveAngle, negativeAngle] = this.getAngle(arr, "likeCount");
         if (positiveAngle) {
-            videoViolation.maxAnglePositiveLike = Math.max(videoViolation.maxAnglePositiveLike, positiveAngle);
-            videoViolation.sumAnglePositiveLike += positiveAngle;
+            videoViolation.maxAnglePositive = Math.max(videoViolation.maxAnglePositive, positiveAngle);
+            videoViolation.sumAnglePositive += positiveAngle;
         }
 
         if (negativeAngle) {
-            videoViolation.maxAngleNegativeLike = Math.max(videoViolation.maxAnglePositiveLike, negativeAngle);
-            videoViolation.sumAngleNegativeLike += negativeAngle;
+            videoViolation.maxAngleNegative = Math.max(videoViolation.maxAngleNegative, negativeAngle);
+            videoViolation.sumAngleNegative += negativeAngle;
         }
 
-        return (positiveAngle > 0) || (negativeAngle > 0);
-    }
-
-    public updateViolationDislike(arr: Statistics[], videoViolation: VideoViolation): boolean {
-        const [positiveAngle, negativeAngle] = this.getAngle(arr, "dislikeCount");
-        if (positiveAngle) {
-            videoViolation.maxAnglePositiveDislike = Math.max(videoViolation.maxAnglePositiveLike, positiveAngle);
-            videoViolation.sumAnglePositiveDislike += positiveAngle;
+        if (videoViolation.sumAngleNegative > 3 || videoViolation.maxAngleNegative > 1.6) {
+            videoViolation.violationIndex = -1;
+        } else {
+            videoViolation.violationIndex = 0;
+            if (videoViolation.maxAnglePositive > 1.2) {
+                videoViolation.violationIndex += 1;
+            }
+            if (videoViolation.sumAnglePositive > 4) {
+                videoViolation.violationIndex += 1;
+            }
+            if (videoViolation.sumAnglePositive > 10) {
+                videoViolation.violationIndex += 1;
+            }
         }
 
-        if (negativeAngle) {
-            videoViolation.maxAngleNegativeDislike = Math.max(videoViolation.maxAnglePositiveLike, negativeAngle);
-            videoViolation.sumAngleNegativeDislike += negativeAngle;
+        if (positiveAngle > 0 || negativeAngle > 0) {
+            if (!videoViolation.firstViolationAt) {
+                videoViolation.firstViolationAt = new Date();
+            }
+
+            videoViolation.lastViolationAt = new Date();
+            return true;
         }
 
-        return (positiveAngle > 0) || (negativeAngle > 0);
+        return false;
     }
 
     public getAngle(arr: Statistics[], yf: string): [number, number] {

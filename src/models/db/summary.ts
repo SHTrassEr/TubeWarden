@@ -4,6 +4,8 @@ import VideoTag from "./videoTag";
 
 @Table({
     tableName: "summary",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_ci",
     timestamps: false,
 })
 export default class Summary extends Model<Summary> {

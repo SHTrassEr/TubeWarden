@@ -1,10 +1,13 @@
 import { GoogleVideoInfo } from "../../models/google/itemInfo";
 
 import Video from "../../models/db/video";
+import VideoViolationDislike from "../../models/db/videoViolationDislike";
+import VideoViolationLike from "../../models/db/videoViolationLike";
 import ChannelService from "./channelService";
 import GoogleVideoService from "./googleVideoService";
 import StemmedWordService from "./stemmedWordService";
 import SummaryService from "./summaryService";
+import { SummaryKey } from "./summaryService";
 import TagService from "./tagService";
 
 export default class VideoService {
@@ -28,7 +31,7 @@ export default class VideoService {
         await this.stemmedWordService.setVideoStemmedWordList(video);
 
         if (video.changed()) {
-            return video.save();
+            await video.save();
         }
     }
 
@@ -40,19 +43,27 @@ export default class VideoService {
         video.nextStatisticsUpdateAt = new Date();
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         video = await video.save();
-        await this.summaryService.increaseVideoCount();
-        return this.setVideoTagTitleList(video, videoInfo.snippet.tags);
+        await VideoViolationLike.create({videoId: video.videoId});
+        await VideoViolationDislike.create({videoId: video.videoId});
+        await this.summaryService.increment(SummaryKey.videoCount, 1);
+        await this.setVideoTagTitleList(video, videoInfo.snippet.tags);
+        await this.stemmedWordService.updateVideo(video.videoId);
+        return video;
     }
 
     public async setDeletedVideoList(deletedVideoIdList: string[]) {
         if (deletedVideoIdList.length > 0) {
-            return Video.update({ deleted: true, deletedAt: new Date() }, {where: {videoId: deletedVideoIdList}});
+            return Video.update(
+                { deleted: true, deletedAt: new Date(), nextStatisticsUpdateAt: null },
+                { where: { videoId: deletedVideoIdList } },
+            );
         }
     }
 
     protected async setVideoTagTitleList(video: Video, tagTitleList: string[]): Promise<Video> {
         const tagList = await this.tagService.getOrCreateTagList(tagTitleList);
-        return await video.$set("tags", tagList);
+        await video.$set("tags", tagList);
+        return video;
     }
 
     protected async updateVideoChannelId(video: Video, channelId: string): Promise<any> {

@@ -1,8 +1,14 @@
-import { Request, Response } from "express";
+
 import { Op } from "sequelize";
+import { IIncludeOptions } from "sequelize-typescript/lib/interfaces/IIncludeOptions";
+
+import { Request, Response } from "express";
 import SummaryService from "../../core/service/summaryService";
+import { SummaryKey } from "../../core/service/summaryService";
 import StemmedWord from "../../models/db/stemmedWord";
 import Video from "../../models/db/video";
+import VideoViolationDislike from "../../models/db/videoViolationDislike";
+import VideoViolationLike from "../../models/db/videoViolationLike";
 
 import createPager from "../../utils/pager";
 import stemString from "../../utils/stemmer";
@@ -16,32 +22,38 @@ function createFilterList() {
         {
             title: "все",
             url: "/videos",
-            getVideoCount: summaryService.getVideoCount.bind(summaryService),
+            summaryKey: SummaryKey.videoCount,
             where: null,
         },
         {
             title: "накрутка лайков",
             url: "/videos/like",
-            getVideoCount: summaryService.getLikeViolationVideoCount.bind(summaryService),
-            where: {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: 0 },
+            summaryKey: SummaryKey.likeViolationCount,
+            where: {violationIndexLike:  {[Op.gt]: 0}},
         },
         {
             title: "накрутка дизлайков",
             url: "/videos/dislike",
-            getVideoCount: summaryService.getDislikeViolationVideoCount.bind(summaryService),
-            where: {  dislikeViolationCnt: {[Op.gt]: 0}, likeViolationCnt: 0 },
+            summaryKey: SummaryKey.dislikeViolationCount,
+            where: {violationIndexDislike:  {[Op.gt]: 0}},
         },
         {
             title: "накрутка лайков и дизлайков",
             url: "/videos/likedislike",
-            getVideoCount: summaryService.getLikeAndDislikeViolationVideoCount.bind(summaryService),
-            where: {  likeViolationCnt: {[Op.gt]: 0}, dislikeViolationCnt: {[Op.gt]: 0}},
+            summaryKey: SummaryKey.likeAndDislikeViolationCount,
+            where: {[Op.and]: [
+                {violationIndexLike:  {[Op.gt]: 0}},
+                {violationIndexDislike:  {[Op.gt]: 0}},
+            ]},
         },
         {
             title: "чудеса",
             url: "/videos/strange",
-            getVideoCount: summaryService.getLikeAndDislikeViolationVideoCount.bind(summaryService),
-            where: { [Op.or]: [{likeStrangeCnt: {[Op.gt]: 0}}, {dislikeStrangeCnt: {[Op.gt]: 0}}] },
+            summaryKey: SummaryKey.strangeViolationVideoCount,
+            where: {[Op.or]: [
+                {violationIndexLike:  {[Op.lt]: 0}},
+                {violationIndexDislike:  {[Op.lt]: 0}},
+            ]},
         },
     ];
 }
@@ -56,13 +68,13 @@ function getSearchString(req: Request) {
 }
 
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
-    const videoCount = await currentFilter.getVideoCount();
 
     const searchString = getSearchString(req);
-    const include = initKeywordFilter(searchString);
+    const includeKeyword = initKeywordFilter(searchString);
 
     let pager;
-    if (!include) {
+    if (!includeKeyword) {
+        const videoCount = await summaryService.getValue(currentFilter.summaryKey);
         pager = createPager(videoCount, parseInt(req.params.pageNum, 10), PAGE_SIZE);
     } else {
         pager = {
@@ -72,6 +84,13 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
             nextPage: null,
             previousPage: null,
         };
+    }
+
+    const include: IIncludeOptions[] = [
+    ];
+
+    if (includeKeyword) {
+        include.push(includeKeyword);
     }
 
     const videoList = await Video.findAll({
@@ -99,11 +118,11 @@ function initKeywordFilter(filter: string) {
     }
 
     const where = {title: sw[0]};
-    return [{
+    return {
         model: StemmedWord,
         duplicating: false,
         where,
-    }];
+    };
 }
 
 export async function getAllVideo(req: Request, res: Response) {

@@ -2,6 +2,8 @@ import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({
     tableName: "statistics",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_ci",
     timestamps: true,
 })
 export default class Statistics extends Model<Statistics> {

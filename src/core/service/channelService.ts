@@ -1,7 +1,9 @@
+import { Op } from "sequelize";
 import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
 import Channel from "../../models/db/channel";
 import Statistics from "../../models/db/statistics";
+import Video from "../../models/db/video";
 import GoogleVideoService from "./googleVideoService";
 
 export default class ChannelService {
@@ -36,6 +38,10 @@ export default class ChannelService {
                 channel.thumbnail = channelInfo.snippet.thumbnails.default.url;
             }
         }
+
+        channel.trendsVideoCount = await Video.count({where: {channelId: channel.id}});
+        channel.likeViolationCount = await Video.count({where: {channelId: channel.id, likeViolationCnt: {[Op.gt]: 0}}});
+        channel.dislikeViolationCount = await Video.count({where: {channelId: channel.id, dislikeViolationCnt: {[Op.gt]: 0}}});
 
         if (channel.changed()) {
             return channel.save();

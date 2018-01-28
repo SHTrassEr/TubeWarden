@@ -4,11 +4,13 @@ import Video from "./video";
 
 @Table({
     tableName: "channels",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_ci",
     timestamps: true,
 })
 export default class Channel extends Model<Channel> {
 
-    @Column({ primaryKey: true })
+    @Column({ primaryKey: true, allowNull: false })
     public id: string;
 
     @Column

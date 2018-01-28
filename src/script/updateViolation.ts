@@ -2,10 +2,22 @@
 import ViolationService from "../core/service/violationService";
 import Statistics from "../models/db/statistics";
 import Video from "../models/db/video";
-import VideoViolation from "../models/db/videoViolation";
+import VideoViolationDislike from "../models/db/videoViolationDislike";
+import VideoViolationLike from "../models/db/videoViolationLike";
+import IVideoViolation from "../models/iVideoViolation";
 import sequelize from "../sequelize";
 
 const violationService: ViolationService = new ViolationService();
+
+function clearVideoViolation(videoViolation: IVideoViolation) {
+    videoViolation.maxAnglePositive = 0;
+    videoViolation.maxAngleNegative = 0;
+    videoViolation.sumAnglePositive = 0;
+    videoViolation.sumAngleNegative = 0;
+    videoViolation.firstViolationAt = null;
+    videoViolation.lastViolationAt = null;
+    videoViolation.violationIndex = 0;
+}
 
 async function updateVideoViolation(video: Video) {
 
@@ -16,19 +28,21 @@ async function updateVideoViolation(video: Video) {
         order: ["createdAt"],
     });
 
-    const [videoViolation] = await VideoViolation.findOrCreate({ where: { videoId: video.videoId }});
+    let videoViolationLike = video.violationLike;
+    if (videoViolationLike == null) {
+        videoViolationLike = await VideoViolationLike.create({ videoId: video.videoId });
+    }
+
+    let videoViolationDislike = video.violationDislike;
+    if (videoViolationDislike == null) {
+        videoViolationDislike = await VideoViolationDislike.create({ videoId: video.videoId });
+    }
+
     const arr: Statistics[] = [null, null, null];
 
-    videoViolation.maxAnglePositiveLike = 0;
-    videoViolation.maxAngleNegativeLike = 0;
-    videoViolation.sumAnglePositiveLike = 0;
-    videoViolation.sumAngleNegativeLike = 0;
-    videoViolation.maxAnglePositiveDislike = 0;
-    videoViolation.maxAngleNegativeDislike = 0;
-    videoViolation.sumAnglePositiveDislike = 0;
-    videoViolation.sumAngleNegativeDislike = 0;
+    clearVideoViolation(videoViolationLike);
+    clearVideoViolation(videoViolationDislike);
 
-    let lastViolationAt: Date = null;
     let lastSt: Statistics;
 
     for (const statistics of statisticsList) {
@@ -39,21 +53,20 @@ async function updateVideoViolation(video: Video) {
         arr[2] = statistics;
 
         if (arr[0] != null) {
-            if (violationService.updateViolation(arr, videoViolation)) {
-                lastViolationAt = statistics.updatedAt;
-            }
+            violationService.updateViolation(arr, "likeCount", videoViolationLike);
+            violationService.updateViolation(arr, "dislikeCount", videoViolationDislike);
         }
     }
 
-    await videoViolation.save();
+    await videoViolationLike.save();
+    await videoViolationDislike.save();
 
     if (lastSt) {
-
-        violationService.updateVideo(video, videoViolation);
+        video.violationIndexLike = videoViolationLike.violationIndex;
+        video.violationIndexDislike = videoViolationDislike.violationIndex;
         video.likeCount = lastSt.likeCount;
         video.dislikeCount = lastSt.dislikeCount;
         video.viewCount = lastSt.viewCount;
-        video.lastViolationAt = lastViolationAt;
         await video.save();
 
     }
@@ -62,8 +75,16 @@ async function updateVideoViolation(video: Video) {
 
 sequelize.authenticate()
 .then(async () => {
+
     // const videoList = await Video.findAll({where: {videoId: "eSN6nkEbwCE"}});
-    const videoList = await Video.findAll();
+    const videoList = await Video.findAll({
+        include: [{
+            model: VideoViolationLike,
+        },
+        {
+            model: VideoViolationDislike,
+        }],
+    });
     for (const video of videoList) {
         await updateVideoViolation(video);
     }

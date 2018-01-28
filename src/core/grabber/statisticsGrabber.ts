@@ -4,10 +4,13 @@ import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/item
 
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
-import VideoViolation from "../../models/db/videoViolation";
+import VideoViolationDislike from "../../models/db/videoViolationDislike";
+import VideoViolationLike from "../../models/db/videoViolationLike";
+import IVideoViolation from "../../models/iVideoViolation";
 
 import GoogleVideoService from "../service/googleVideoService";
 import SummaryService from "../service/summaryService";
+import { SummaryKey } from "../service/summaryService";
 import VideoService from "../service/videoService";
 import ViolationService from "../service/violationService";
 
@@ -29,9 +32,14 @@ export default class StatisticsGrabber {
 
     public async process(maxResults: number): Promise<number> {
         const videoList = await Video.findAll({
+            include: [{
+                model: VideoViolationLike,
+            },
+            {
+                model: VideoViolationDislike,
+            }],
             limit: maxResults,
             where: {
-                deleted: false,
                 nextStatisticsUpdateAt: { [Op.lt]: new Date() },
         }});
 
@@ -72,12 +80,7 @@ export default class StatisticsGrabber {
             await statistics.save();
             statisticsList.push(statistics);
         }
-
-        const isViolated = video.isViolated();
-        video = await this.updateVideo(video, statisticsList);
-        if (!isViolated && video.isViolated()) {
-            await this.summaryService.increaseViolationCount();
-        }
+        this.updateVideo(video, statisticsList);
 
         return video;
     }
@@ -86,23 +89,38 @@ export default class StatisticsGrabber {
         if (statisticsList && statisticsList.length > 0) {
             video.statisticsUpdatedAt = new Date();
 
-            const [videoViolation] = await VideoViolation.findOrCreate({ where: { videoId: video.videoId }});
-            const lastSt: Statistics = statisticsList[statisticsList.length - 1];
+            let videoViolationLike = video.violationLike;
+            if (videoViolationLike == null) {
+                videoViolationLike = await VideoViolationLike.create({ videoId: video.videoId });
+            }
+            const oldLikeViolationIndex = videoViolationLike.violationIndex;
 
-            const violated = this.violationService.updateViolation(statisticsList, videoViolation);
-
-            this.violationService.updateVideo(video, videoViolation);
-
-            if (violated) {
-                video.lastViolationAt = new Date();
+            let videoViolationDislike = video.violationDislike;
+            if (videoViolationDislike == null) {
+                videoViolationDislike = await VideoViolationDislike.create({ videoId: video.videoId });
             }
 
-            video.nextStatisticsUpdateAt = this.getNextUpdateTime(video);
+            const oldDisikeViolationIndex = videoViolationDislike.violationIndex;
+
+            const lastSt: Statistics = statisticsList[statisticsList.length - 1];
+
+            this.violationService.updateViolation(statisticsList, "likeCount", videoViolationLike);
+            this.violationService.updateViolation(statisticsList, "dislikeCount", videoViolationDislike);
+
+            video.nextStatisticsUpdateAt = this.getNextUpdateTime(video, videoViolationLike, videoViolationDislike);
             video.likeCount = lastSt.likeCount;
             video.dislikeCount = lastSt.dislikeCount;
             video.viewCount = lastSt.viewCount;
-            await videoViolation.save();
+            video.violationIndexLike = videoViolationLike.violationIndex;
+            video.violationIndexDislike = videoViolationDislike.violationIndex;
+            await videoViolationLike.save();
+            await videoViolationDislike.save();
             await video.save();
+            await this.summaryService.updateViolation(
+                oldLikeViolationIndex,
+                oldDisikeViolationIndex,
+                videoViolationLike.violationIndex,
+                videoViolationDislike.violationIndex);
             return video;
         }
     }
@@ -151,10 +169,14 @@ export default class StatisticsGrabber {
         return new Date(date.getTime() + min * 60 * 1000);
     }
 
-    protected getNextUpdateTime(video: Video): Date {
-        let lastViolationAt: Date = video.createdAt;
-        if (video.lastViolationAt) {
-            lastViolationAt = video.lastViolationAt;
+    protected getNextUpdateTime(video: Video, videoViolationLike: IVideoViolation, videoViolationDisike: IVideoViolation): Date {
+        let lastViolationAt = video.createdAt;
+        if (videoViolationLike.lastViolationAt && videoViolationLike.lastViolationAt > lastViolationAt) {
+            lastViolationAt = videoViolationLike.lastViolationAt;
+        }
+
+        if (videoViolationDisike.lastViolationAt && videoViolationDisike.lastViolationAt > lastViolationAt) {
+            lastViolationAt = videoViolationDisike.lastViolationAt;
         }
 
         const diff = this.getDateDiffMinutes(lastViolationAt, video.statisticsUpdatedAt);

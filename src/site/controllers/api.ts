@@ -3,6 +3,8 @@ import { Op } from "sequelize";
 import Statistics from "../../models/db/statistics";
 import Summary from "../../models/db/summary";
 import Video from "../../models/db/video";
+import VideoViolationDislike from "../../models/db/videoViolationDislike";
+import VideoViolationLike from "../../models/db/videoViolationLike";
 
 export async function getVideoList(req: Request, res: Response) {
     const videoList = await Video.findAll({ limit: 50 });
@@ -20,15 +22,25 @@ export async function getStatisticsByVideo(req: Request, res: Response) {
 }
 
 export async function getTrendsVideoList(req: Request, res: Response) {
+
     const videoList = await Video.findAll({
-        attributes: ["videoId", "likeCount", "dislikeCount", "viewCount", "likeViolationCnt", "dislikeViolationCnt"],
-        limit: 100 ,
+        attributes: ["videoId", "likeCount", "dislikeCount", "viewCount", "violationIndexLike", "violationIndexDislike"],
+        limit: 80,
         order: [
             ["trendsAt", "DESC"],
         ],
     });
 
-    res.json(videoList);
+    const result = videoList.map((v) => ({
+        videoId: v.videoId,
+        likeCount: v.likeCount,
+        dislikeCount: v.dislikeCount,
+        viewCount: v.viewCount,
+        likeViolationCnt: v.violationIndexLike,
+        dislikeViolationCnt: v.violationIndexDislike,
+    }));
+
+    res.json(result);
 }
 
 export async function getSummaryList(req: Request, res: Response) {
