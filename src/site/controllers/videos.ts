@@ -1,4 +1,6 @@
 
+import { Sequelize } from "sequelize-typescript";
+
 import { Op } from "sequelize";
 import { IIncludeOptions } from "sequelize-typescript/lib/interfaces/IIncludeOptions";
 
@@ -60,11 +62,12 @@ function createFilterList() {
 
 function getSearchString(req: Request) {
     const searchString = req.param("s", "");
-    if (searchString) {
+    return searchString;
+/*    if (searchString) {
         return searchString.split(" ")[0];
     }
 
-    return "";
+    return "";*/
 }
 
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
@@ -94,6 +97,7 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
     }
 
     const videoList = await Video.findAll({
+
         include,
         offset: pager.offset,
         limit: pager.pageSize,
@@ -117,12 +121,39 @@ function initKeywordFilter(filter: string) {
         return null;
     }
 
-    const where = {title: sw[0]};
-    return {
+    const include = {
+        attributes: [],
         model: StemmedWord,
         duplicating: false,
-        where,
+        requred: true,
+        where: {title: sw[0]},
+        include: [],
     };
+
+    let lastInclude = include;
+    const wordCnt = Math.min(sw.length, 5);
+    for (let i = 1; i < wordCnt; i++) {
+
+        lastInclude.include.push({
+            attributes: [],
+            model: Video,
+            requred: true,
+            duplicating: false,
+            where: { videoId: {[Op.eq]: Sequelize.literal("`Video`.`videoId`")} },
+            include: [{
+                attributes: [],
+                model: StemmedWord,
+                duplicating: false,
+                requred: true,
+                where: {title: sw[i]},
+                include: [],
+            }],
+        });
+
+        lastInclude = lastInclude.include[0].include[0];
+    }
+
+    return include;
 }
 
 export async function getAllVideo(req: Request, res: Response) {
