@@ -61,13 +61,7 @@ function createFilterList() {
 }
 
 function getSearchString(req: Request) {
-    const searchString = req.param("s", "");
-    return searchString;
-/*    if (searchString) {
-        return searchString.split(" ")[0];
-    }
-
-    return "";*/
+    return req.param("s", "");
 }
 
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
