@@ -1,5 +1,4 @@
 declare const videoId: string;
-// declare const Highcharts: any;
 
 (() => {
     function getX(st): number {
@@ -131,6 +130,8 @@ declare const videoId: string;
 
         let stl;
         let stm;
+        let stmd;
+        let date;
         let str;
 
         let likeAngle;
@@ -146,11 +147,11 @@ declare const videoId: string;
                 likeAngle = getAngle2(stl, stm, str, "likeCount");
                 dislikeAngle = getAngle2(stl, stm, str, "dislikeCount");
             }
+            stmd = date;
+            date = d.updatedAt.getTime();
 
-            const date = d.updatedAt.getTime();
-
-            createAnnotationLabel(date, d.likeCount, likeAngle, likeViolationList);
-            createAnnotationLabel(date, d.dislikeCount, dislikeAngle, dislikeViolationList);
+            createAnnotationLabel(stmd, d.likeCount, likeAngle, likeViolationList);
+            createAnnotationLabel(stmd, d.dislikeCount, dislikeAngle, dislikeViolationList);
 
             chart.series[0].data.push([date, d.likeCount]);
             chart.series[1].data.push([date, d.dislikeCount]);
@@ -190,36 +191,11 @@ declare const videoId: string;
         };
         initData(data, chart);
         return Highcharts.chart(container, chart);
-/*
-        const chartData = {
-            datasets: [{
-                label: "Лайков",
-                backgroundColor: chartColors.green,
-                borderColor: chartColors.green,
-                fill: false,
-                lineTension: 0,
-                data: data.map((d) => ( {x: new Date (d.updatedAt), y: d.likeCount } )),
-            },
-            {
-                label: "Дизлайков",
-                fill: false,
-                backgroundColor: chartColors.red,
-                borderColor: chartColors.red,
-                lineTension: 0,
-                data: data.map((d) => ({x: new Date (d.updatedAt), y: d.dislikeCount } )),
-            }],
-        };
-
-        const chart = new Chart(ctx, { type: "line", data: chartData, options: chartOptions });
-        */
     }
 
     $(document).ready(() => {
         $.getJSON("/api/statistics/" + videoId, (data) => {
-            // const ctxRating = (document.getElementById("statisticsLikeChart") as HTMLCanvasElement).getContext("2d");
-            const ctxView = (document.getElementById("statisticsViewChart") as HTMLCanvasElement).getContext("2d");
             initRatingChart(data, "statisticsLikeChart");
-            // initViewChart(data, ctxView);
         });
 
     });
