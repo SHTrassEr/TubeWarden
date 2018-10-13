@@ -2,7 +2,7 @@ import * as google from "googleapis";
 
 import { GoogleChannelInfo, GoogleResultItemList, GoogleVideoInfo } from "../../models/google/itemInfo";
 
-const service: any = google.youtube("v3");
+const service: any = google.youtube_v3;
 
 export default class GoogleVideoService {
 

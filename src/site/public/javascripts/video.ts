@@ -103,6 +103,14 @@ declare const videoId: string;
         }
     }
 
+    function getDelta(stl, stm, str, yf: string) {
+        const dx: number = (getX(str) - getX(stm)) / 60;
+
+        const y: number = ((getX(str) - getX(stl)) * (stm[yf] - stl[yf])) / (getX(stm) - getX(stl)) + stl[yf];
+
+        return Math.abs( (str[yf] - y) / dx);
+    }
+
     function initData(data, chart) {
 
         const likeViolationList = [];
@@ -120,6 +128,14 @@ declare const videoId: string;
             color: chartColors.orange,
             name: "Просмотры",
             visible: false,
+            data: [],
+        }, {
+            color: chartColors.green,
+            name: "Лайки-дельта",
+            data: [],
+        }, {
+            color: chartColors.red,
+            name: "Дизлайки-дельта",
             data: [],
         }];
 
@@ -156,6 +172,53 @@ declare const videoId: string;
             chart.series[0].data.push([date, d.likeCount]);
             chart.series[1].data.push([date, d.dislikeCount]);
             chart.series[2].data.push([date, d.viewCount]);
+
+            if (stl) {
+                chart.series[3].data.push([date, getDelta(stl, stm, str, "likeCount") ]);
+                chart.series[4].data.push([date, getDelta(stl, stm, str, "dislikeCount") ]);
+            } else {
+                chart.series[3].data.push([date, 0 ]);
+                chart.series[4].data.push([date, 0 ]);
+            }
+
+
+        }
+    }
+
+    function initDeltaData(data, chart) {
+
+        const likeViolationList = [];
+        const dislikeViolationList = [];
+
+        chart.series = [{
+            color: chartColors.green,
+            name: "Лайки",
+            data: [],
+        }, {
+            color: chartColors.red,
+            name: "Дизлайки",
+            data: [],
+        }];
+
+        let stl;
+        let stm;
+        let stmd;
+        let date;
+        let str;
+
+        for (const d of data) {
+            d.updatedAt = new Date(d.updatedAt);
+            stl = stm;
+            stm = str;
+            str = d;
+
+            stmd = date;
+            date = d.updatedAt.getTime();
+
+            if (stl) {
+                chart.series[0].data.push([date, getDelta(stl, stm, str, "likeCount") ]);
+                chart.series[1].data.push([date, getDelta(stl, stm, str, "dislikeCount") ]);
+            }
         }
     }
 
@@ -190,6 +253,41 @@ declare const videoId: string;
             annotations: null,
         };
         initData(data, chart);
+        return Highcharts.chart(container, chart);
+    }
+
+
+    function initDeltaChart(data, container) {
+
+        const chart: any = {
+            chart: {
+                zoomType: "xy",
+                panning: true,
+                panKey: "shift",
+            },
+            tooltip: {
+                crosshairs: true,
+                shared: true,
+            },
+            title: {
+                text: "",
+            },
+
+            xAxis: {
+                type: "datetime",
+                title: {
+                    text: "",
+                },
+            },
+            yAxis: {
+                title: {
+                    text: "",
+                },
+            },
+            series: null,
+            annotations: null,
+        };
+        initDeltaData(data, chart);
         return Highcharts.chart(container, chart);
     }
 

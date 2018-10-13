@@ -40,8 +40,8 @@ export default class ChannelService {
         }
 
         channel.trendsVideoCount = await Video.count({where: {channelId: channel.id}});
-        channel.likeViolationCount = await Video.count({where: {channelId: channel.id, likeViolationCnt: {[Op.gt]: 0}}});
-        channel.dislikeViolationCount = await Video.count({where: {channelId: channel.id, dislikeViolationCnt: {[Op.gt]: 0}}});
+        channel.likeViolationCount = await Video.count({where: {channelId: channel.id, violationIndexLike: {[Op.gt]: 0}}});
+        channel.dislikeViolationCount = await Video.count({where: {channelId: channel.id, violationIndexDislike: {[Op.gt]: 0}}});
 
         if (channel.changed()) {
             return channel.save();

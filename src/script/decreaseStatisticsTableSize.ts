@@ -1,4 +1,5 @@
-import { Promise } from "bluebird";
+// import { Promise } from "bluebird";
+import * as Bluebird from "bluebird";
 import ViolationService from "../core/service/violationService";
 
 import Statistics from "../models/db/statistics";
@@ -9,7 +10,7 @@ const violationService: ViolationService = new ViolationService();
 
 let totalD: number = 0;
 
-function process(video: Video): Promise {
+function process(video: Video): Bluebird<any> {
     return Statistics.findAll({
         where: {
             videoId: video.videoId,
@@ -42,7 +43,7 @@ sequelize.authenticate()
     return Video.findAll();
 })
 .then((videoList) => {
-    return Promise.each(videoList, (video) => process(video));
+    return Bluebird.each(videoList, (video) => process(video));
 })
 .then(() => {
     sequelize.close();
