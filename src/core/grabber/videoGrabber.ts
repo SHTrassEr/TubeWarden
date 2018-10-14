@@ -1,4 +1,4 @@
-import { GoogleVideoInfo } from "../../models/google/itemInfo";
+import { youtube_v3 } from "googleapis";
 
 import Video from "../../models/db/video";
 import GoogleVideoService from "../service/googleVideoService";
@@ -46,10 +46,10 @@ export default class VideoGrabber {
         }
     }
 
-    protected createVideoInfoHash(infoList: GoogleVideoInfo[]): Map<string, GoogleVideoInfo> {
+    protected createVideoInfoHash(infoList: youtube_v3.Schema$Video[]): Map<string, youtube_v3.Schema$Video> {
         return infoList.reduce((map, obj) => {
             return map.set(obj.id, obj);
-        }, new Map<string, GoogleVideoInfo>());
+        }, new Map<string, youtube_v3.Schema$Video>());
     }
 
 }

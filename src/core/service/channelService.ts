@@ -1,10 +1,12 @@
+import { youtube_v3 } from "googleapis";
 import { Op } from "sequelize";
 import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
 import Channel from "../../models/db/channel";
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
-import GoogleVideoService from "./googleVideoService";
+
+import tryParseInt from "../../utils/convert";
 
 export default class ChannelService {
 
@@ -18,7 +20,7 @@ export default class ChannelService {
         return channel.save();
     }
 
-    public async updateChannel(channel: Channel, channelInfo: GoogleChannelInfo) {
+    public async updateChannel(channel: Channel, channelInfo: youtube_v3.Schema$Channel) {
         if (channelInfo.snippet.title) {
             channel.title = channelInfo.snippet.title;
         } else {
@@ -27,11 +29,11 @@ export default class ChannelService {
 
         if (channelInfo.statistics) {
             if (channelInfo.statistics.videoCount) {
-                channel.videoCount = channelInfo.statistics.videoCount;
+                channel.videoCount = tryParseInt(channelInfo.statistics.videoCount);
             }
 
             if (channelInfo.statistics.subscriberCount) {
-                channel.subscriberCount = channelInfo.statistics.subscriberCount;
+                channel.subscriberCount = tryParseInt(channelInfo.statistics.subscriberCount);
             }
 
             if (channelInfo.snippet.thumbnails && channelInfo.snippet.thumbnails.default) {

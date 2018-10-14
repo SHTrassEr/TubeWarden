@@ -1,8 +1,8 @@
-import * as google from "googleapis";
-
+import { AxiosResponse } from "axios";
+import { google, youtube_v3 } from "googleapis";
 import { GoogleChannelInfo, GoogleResultItemList, GoogleVideoInfo } from "../../models/google/itemInfo";
 
-const service: any = google.youtube_v3;
+const service: youtube_v3.Youtube = google.youtube("v3");
 
 export default class GoogleVideoService {
 
@@ -12,20 +12,21 @@ export default class GoogleVideoService {
         this.auth = auth;
     }
 
-    public getVideoStatistics(videoIdList: string[]): Promise<GoogleVideoInfo[]> {
-        const auth = this.auth;
+    public getVideoStatistics(videoIdList: string[]): Promise<youtube_v3.Schema$Video[]> {
+        const param: any = {
+            auth: this.auth,
+            part: "statistics",
+            id: videoIdList.join(),
+            fields: "items(id,statistics)",
+        };
+
         return new Promise((resolve, reject) => {
-            service.videos.list({
-                auth,
-                part: "statistics",
-                id: videoIdList.join(),
-                fields: "items(id,statistics)",
-            }, (err, data) => {
+            service.videos.list(param, (err, response: AxiosResponse<youtube_v3.Schema$VideoListResponse>) => {
                 if (err) {
                     reject(err);
                 } else {
-                    if (data.items) {
-                        resolve(data.items);
+                    if (response.data.items) {
+                        resolve(response.data.items);
                     } else {
                         resolve([]);
                     }
@@ -34,20 +35,20 @@ export default class GoogleVideoService {
         });
     }
 
-    public getVideoInfo(videoIdList: string[]): Promise<GoogleVideoInfo[]> {
-        const auth = this.auth;
+    public getVideoInfo(videoIdList: string[]): Promise<youtube_v3.Schema$Video[]> {
+        const param: any  = {
+            auth: this.auth,
+            part: "snippet",
+            id: videoIdList.join(),
+            fields: "items(id,snippet(tags,channelId,publishedAt,title))",
+        };
         return new Promise((resolve, reject) => {
-            service.videos.list({
-                auth,
-                part: "snippet",
-                id: videoIdList.join(),
-                fields: "items(id,snippet(tags,channelId,publishedAt,title))",
-            }, (err, data) => {
+            service.videos.list(param, (err, response: AxiosResponse<youtube_v3.Schema$VideoListResponse>) => {
                 if (err) {
                     reject(err);
                 } else {
-                    if (data.items) {
-                        resolve(data.items);
+                    if (response.data.items) {
+                        resolve(response.data.items);
                     } else {
                         resolve([]);
                     }
@@ -56,20 +57,20 @@ export default class GoogleVideoService {
         });
     }
 
-    public getChannelInfo(channelIdList: string[]): Promise<GoogleChannelInfo[]> {
-        const auth = this.auth;
+    public getChannelInfo(channelIdList: string[]): Promise<youtube_v3.Schema$ChannelListResponse[]> {
+        const param: any  = {
+            auth: this.auth,
+            part: "snippet,statistics",
+            id: channelIdList.join(),
+            fields: "items(id,snippet(thumbnails/default,title),statistics(subscriberCount,videoCount))",
+        };
         return new Promise((resolve, reject) => {
-            service.channels.list({
-                auth,
-                part: "snippet,statistics",
-                id: channelIdList.join(),
-                fields: "items(id,snippet(thumbnails/default,title),statistics(subscriberCount,videoCount))",
-            }, (err, data) => {
+            service.channels.list(param, (err, response: AxiosResponse<youtube_v3.Schema$ChannelListResponse>) => {
                 if (err) {
                     reject(err);
                 } else {
-                    if (data.items) {
-                        resolve(data.items);
+                    if (response.data.items) {
+                        resolve(response.data.items);
                     } else {
                         resolve([]);
                     }
@@ -79,21 +80,22 @@ export default class GoogleVideoService {
     }
 
     public getMostPopularVideoId(regionCode: string, maxResults: number): Promise<string[]> {
-        const auth = this.auth;
+        const param: any  = {
+            auth: this.auth,
+            regionCode,
+            maxResults,
+            part: "snippet",
+            chart: "mostPopular",
+            fields: "items(id)",
+        };
+
         return new Promise((resolve, reject) => {
-            service.videos.list({
-                auth,
-                regionCode,
-                maxResults,
-                part: "snippet",
-                chart: "mostPopular",
-                fields: "items(id)",
-            }, (err, data) => {
+            service.videos.list(param, (err, response: AxiosResponse<youtube_v3.Schema$VideoListResponse>) => {
                 if (err) {
                     reject(err);
                 } else {
-                    if (data.items) {
-                        resolve(data.items.map((d) => d.id ));
+                    if (response.data.items) {
+                        resolve(response.data.items.map((d) => d.id ));
                     } else {
                         resolve([]);
                     }

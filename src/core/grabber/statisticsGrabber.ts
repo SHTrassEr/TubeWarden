@@ -1,18 +1,18 @@
+import { youtube_v3 } from "googleapis";
 import { Op } from "sequelize";
-
-import { GoogleVideoInfo, GoogleVideoStatistics } from "../../models/google/itemInfo";
 
 import Statistics from "../../models/db/statistics";
 import Video from "../../models/db/video";
 import VideoViolationDislike from "../../models/db/videoViolationDislike";
 import VideoViolationLike from "../../models/db/videoViolationLike";
 import IVideoViolation from "../../models/iVideoViolation";
-
 import GoogleVideoService from "../service/googleVideoService";
 import SummaryService from "../service/summaryService";
 import { SummaryKey } from "../service/summaryService";
 import VideoService from "../service/videoService";
 import ViolationService from "../service/violationService";
+
+import tryParseInt from "../../utils/convert";
 
 export default class StatisticsGrabber {
 
@@ -67,7 +67,7 @@ export default class StatisticsGrabber {
         }
     }
 
-    protected async saveStatistics(video: Video, statisticsInfo: GoogleVideoStatistics): Promise<any>  {
+    protected async saveStatistics(video: Video, statisticsInfo: youtube_v3.Schema$VideoStatistics): Promise<any>  {
         const statistics = this.createStatistics(video.videoId, statisticsInfo);
         const reqiredItemCnt = this.violationService.getRequredItemCnt();
         const statisticsList = await this.getLastStatistics(video.videoId, reqiredItemCnt);
@@ -138,13 +138,13 @@ export default class StatisticsGrabber {
         return statisticsList;
     }
 
-    protected createStatisticsInfoHash(infoList: GoogleVideoInfo[]): Map<string, GoogleVideoStatistics> {
+    protected createStatisticsInfoHash(infoList: youtube_v3.Schema$Video[]): Map<string, youtube_v3.Schema$VideoStatistics> {
         return infoList.reduce((map, obj) => {
             return map.set(obj.id, obj.statistics);
-        }, new Map<string, GoogleVideoStatistics>());
+        }, new Map<string, youtube_v3.Schema$VideoStatistics>());
     }
 
-    protected createStatistics(videoId: string, statisticsInfo: GoogleVideoStatistics): Statistics {
+    protected createStatistics(videoId: string, statisticsInfo: youtube_v3.Schema$VideoStatistics): Statistics {
         const date = new Date();
         const statistics = new Statistics();
         statistics.videoId = videoId;
@@ -154,11 +154,11 @@ export default class StatisticsGrabber {
         return statistics;
     }
 
-    protected initStatistics(statistics: Statistics, statisticsInfo: GoogleVideoStatistics): void {
-        statistics.viewCount = statisticsInfo.viewCount;
-        statistics.likeCount = statisticsInfo.likeCount;
-        statistics.dislikeCount = statisticsInfo.dislikeCount;
-        statistics.commentCount = statisticsInfo.commentCount;
+    protected initStatistics(statistics: Statistics, statisticsInfo: youtube_v3.Schema$VideoStatistics): void {
+        statistics.viewCount =  tryParseInt(statisticsInfo.viewCount);
+        statistics.likeCount = tryParseInt(statisticsInfo.likeCount);
+        statistics.dislikeCount = tryParseInt(statisticsInfo.dislikeCount);
+        statistics.commentCount = tryParseInt(statisticsInfo.commentCount);
     }
 
     protected getDateDiffMinutes(dateStart: Date, dateEnd: Date): number {
@@ -192,9 +192,11 @@ export default class StatisticsGrabber {
             return this.getDateAddMinutes(video.statisticsUpdatedAt, delay);
         }
 
-        const diffTrends = this.getDateDiffMinutes(video.trendsAt, video.statisticsUpdatedAt);
-        if (diffTrends <= this.statisticsUpdateCfg.lowDealyAt) {
-            return this.getDateAddMinutes(video.statisticsUpdatedAt, this.statisticsUpdateCfg.delayMax);
+        if (video.trendsAt && video.statisticsUpdatedAt) {
+            const diffTrends = this.getDateDiffMinutes(video.trendsAt, video.statisticsUpdatedAt);
+            if (diffTrends <= this.statisticsUpdateCfg.lowDealyAt) {
+                return this.getDateAddMinutes(video.statisticsUpdatedAt, this.statisticsUpdateCfg.delayMax);
+            }
         }
 
         return null;

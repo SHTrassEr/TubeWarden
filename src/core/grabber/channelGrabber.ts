@@ -1,5 +1,5 @@
+import { youtube_v3 } from "googleapis";
 import { IFindOptions } from "sequelize-typescript/lib/interfaces/IFindOptions";
-import { GoogleChannelInfo } from "../../models/google/itemInfo";
 
 import Channel from "../../models/db/channel";
 import ChannelService from "../service/channelService";
@@ -53,10 +53,10 @@ export default class ChannelGrabber {
         }
     }
 
-    protected createChannelInfoHash(infoList: GoogleChannelInfo[]): Map<string, GoogleChannelInfo> {
+    protected createChannelInfoHash(infoList: youtube_v3.Schema$Channel[]): Map<string, youtube_v3.Schema$Channel> {
         return infoList.reduce((map, obj) => {
             return map.set(obj.id, obj);
-        }, new Map<string, GoogleChannelInfo>());
+        }, new Map<string, youtube_v3.Schema$Channel>());
     }
 
 }

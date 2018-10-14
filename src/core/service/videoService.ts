@@ -1,4 +1,4 @@
-import { GoogleVideoInfo } from "../../models/google/itemInfo";
+import { youtube_v3 } from "googleapis";
 
 import Video from "../../models/db/video";
 import VideoViolationDislike from "../../models/db/videoViolationDislike";
@@ -24,7 +24,7 @@ export default class VideoService {
         this.stemmedWordService = new StemmedWordService();
     }
 
-    public async updateVideo(video: Video, videoInfo: GoogleVideoInfo) {
+    public async updateVideo(video: Video, videoInfo: youtube_v3.Schema$Video) {
         video.title = videoInfo.snippet.title;
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         await this.setVideoTagTitleList(video, videoInfo.snippet.tags);
@@ -35,11 +35,14 @@ export default class VideoService {
         }
     }
 
-    public async createVideo(videoInfo: GoogleVideoInfo): Promise<Video> {
+    public async createVideo(videoInfo: youtube_v3.Schema$Video): Promise<Video> {
         let video = new Video();
         video.videoId = videoInfo.id;
         video.title = videoInfo.snippet.title;
-        video.publishedAt = videoInfo.snippet.publishedAt;
+        if (videoInfo.snippet.publishedAt) {
+            video.publishedAt = new Date(videoInfo.snippet.publishedAt);
+        }
+
         video.nextStatisticsUpdateAt = new Date();
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         video = await video.save();

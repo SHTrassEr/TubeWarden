@@ -1,4 +1,4 @@
-import { GoogleVideoInfo } from "../../models/google/itemInfo";
+import { youtube_v3 } from "googleapis";
 
 import Video from "../../models/db/video";
 import GoogleVideoService from "../service/googleVideoService";
