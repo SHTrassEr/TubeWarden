@@ -76,7 +76,17 @@ async function updateVideoViolation(video: Video) {
 sequelize.authenticate()
 .then(async () => {
 
-    // const videoList = await Video.findAll({where: {videoId: "eSN6nkEbwCE"}});
+/*
+    const videoList = await Video.findAll({
+        where: {videoId: "CfI4a0lJ7rA"},
+        include: [{
+            model: VideoViolationLike,
+        },
+        {
+            model: VideoViolationDislike,
+        }],
+    });
+*/
     const videoList = await Video.findAll({
         include: [{
             model: VideoViolationLike,

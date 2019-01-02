@@ -6,7 +6,7 @@ import { Column, DataType, Model, Table } from "sequelize-typescript";
     collate: "utf8mb4_unicode_ci",
     timestamps: true,
 })
-export default class Statistics extends Model<Statistics> {
+export default class Statistics extends Model<Statistics> implements IStatistics {
 
     @Column
     public  viewCount: number;
@@ -26,4 +26,14 @@ export default class Statistics extends Model<Statistics> {
     @Column({ primaryKey: true })
     public createdAt: Date;
 
+}
+
+export interface IStatistics {
+    viewCount: number;
+    likeCount: number;
+    dislikeCount: number;
+    commentCount: number;
+    videoId: string;
+    createdAt: Date;
+    updatedAt?: Date;
 }

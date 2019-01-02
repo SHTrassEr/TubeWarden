@@ -1,4 +1,4 @@
-import Statistics from "../../models/db/statistics";
+import { IStatistics } from "../../models/db/statistics";
 import Video from "../../models/db/video";
 import IVideoViolation from "../../models/iVideoViolation";
 
@@ -18,8 +18,8 @@ export default class ViolationService {
         return itemCnt;
     }
 
-    public updateViolation(arr: Statistics[], fieldName: string, videoViolation: IVideoViolation): boolean {
-        const [positiveAngle, negativeAngle] = this.getAngle(arr, fieldName);
+    public updateViolation(arr: IStatistics[], fieldName: string, videoViolation: IVideoViolation): boolean {
+        const [positiveAngle, negativeAngle] = this.getAngleTreshold(arr, fieldName);
 
         if (positiveAngle) {
             videoViolation.maxAnglePositive = Math.max(videoViolation.maxAnglePositive, positiveAngle);
@@ -58,26 +58,51 @@ export default class ViolationService {
         return false;
     }
 
-    public getAngle(arr: Statistics[], yf: string): [number, number] {
+    public getAngleTreshold(arr: IStatistics[], yf: string): [number, number] {
 
         if (arr.length < itemCnt) {
             return [0, 0];
         }
 
-        let [positiveAngle, negativeAngle] = this.getAngle2(arr[arr.length - 3], arr[arr.length - 2], arr[arr.length - 1], yf);
+        const stl = arr[arr.length - 3];
+        const stm = arr[arr.length - 2];
+        const str = arr[arr.length - 1];
 
-        if (Math.abs(positiveAngle) < 0.6) {
+        let [positiveAngle, negativeAngle] = this.getAngle(stl, stm, str, yf);
+
+        if (Math.abs(positiveAngle) < 0.20) {
             positiveAngle = 0;
         }
 
-        if (Math.abs(negativeAngle) < 0.6) {
+        if (Math.abs(negativeAngle) < 0.20) {
             negativeAngle = 0;
         }
+
+        const d = stm[yf] * 0.05;
+        const dy = this.getDeltaY(stl, stm, str, yf);
+
+        const e = Math.min(1, dy / d);
+        positiveAngle = positiveAngle * e;
 
         return [positiveAngle, negativeAngle];
     }
 
-    public isPointAtLine(point: Statistics, line: Statistics[], yf: string, ep?: number): boolean {
+    public getDeltaY(stl: IStatistics, stm: IStatistics, str: IStatistics, yf: string): number {
+        if (stl[yf] === stm[yf] && stm[yf] === str[yf]) {
+            return 0;
+        }
+
+        const dx = (this.getX(stm) - this.getX(stl)) / 60;
+        if (dx < 1) {
+            return 0;
+        }
+
+        const y = ((this.getX(str) - this.getX(stl)) * (stm[yf] - stl[yf])) / (this.getX(stm) - this.getX(stl)) + stl[yf];
+
+        return Math.abs(str[yf] - y);
+    }
+
+    public isPointAtLine(point: IStatistics, line: IStatistics[], yf: string, ep?: number): boolean {
         if (line.length < 2) {
             return false;
         }
@@ -86,9 +111,9 @@ export default class ViolationService {
             ep = atLineEp;
         }
 
-        const stl: Statistics = line[line.length - 2];
-        const stm: Statistics = line[line.length - 1];
-        const str: Statistics = point;
+        const stl = line[line.length - 2];
+        const stm = line[line.length - 1];
+        const str = point;
 
         if (stl[yf] === stm[yf] && stm[yf] === str[yf]) {
             return true;
@@ -111,14 +136,14 @@ export default class ViolationService {
         return Math.abs(stm[yf] - y) <=  ey;
     }
 
-    public isStatisticsAtLine(point: Statistics, line: Statistics[]): boolean {
+    public isStatisticsAtLine(point: IStatistics, line: IStatistics[]): boolean {
         return this.isPointAtLine(point, line, "likeCount")
             && this.isPointAtLine(point, line, "dislikeCount")
             && this.isPointAtLine(point, line, "viewCount", 0.01);
     }
 
-    protected getAngle2(stl: Statistics, stm: Statistics, str: Statistics, yf: string): [number, number] {
-        if (this.getX(str) !== this.getX(stm) && this.getX(stm) !== this.getX(stl)) {
+    public getAngle(stl: IStatistics, stm: IStatistics, str: IStatistics, yf: string): [number, number] {
+        if (this.getX(stl) < this.getX(stm) && this.getX(stm) < this.getX(str)) {
 
             if (stl[yf] === stm[yf] && stm[yf] === str[yf]) {
                 return [0, 0];
@@ -142,13 +167,14 @@ export default class ViolationService {
                 y: 0,
             };
 
-            p1.x = (this.getX(stl) - this.getX(stm)) * -1;
-            p1.y = (stl[yf] - stm[yf]) * -1;
+            p1.x = (this.getX(stm) - this.getX(stl));
+            p1.y = (stm[yf] - stl[yf]);
 
             p2.x = this.getX(str) - this.getX(stm);
             p2.y = str[yf] - stm[yf];
 
             const positiveAngle = this.getVectorAngle(p1, p2);
+
             let negativeAngle = 0;
 
             if (p2.y < 0) {
@@ -168,7 +194,8 @@ export default class ViolationService {
             return 0;
         }
 
-        const cos = ((p1.x * p2.x + p1.y * p2.y) / Math.pow(p1.x * p1.x + p1.y * p1.y, 0.5)) / Math.pow(p2.x * p2.x + p2.y * p2.y, 0.5);
+        const cos = (p1.x * p2.x + p1.y * p2.y) / (Math.pow(p1.x * p1.x + p1.y * p1.y, 0.5) * Math.pow(p2.x * p2.x + p2.y * p2.y, 0.5));
+
         if (cos >= 1) {
             return 0;
         }
@@ -177,7 +204,7 @@ export default class ViolationService {
         return angle;
     }
 
-    protected getX(st: Statistics): number {
+    protected getX(st: IStatistics): number {
         return ((st.updatedAt.getTime() / 1000) );
     }
 

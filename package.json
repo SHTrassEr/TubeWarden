@@ -10,7 +10,8 @@
     "build:core": "tsc --project ./src/tsconfig.json",
     "build:client": "tsc --project ./src/site/public/tsconfig.json",
     "build:css": "node-sass --include-path ./src/site/public/scss ./src/site/public/scss/main.scss   ./bin/site/public/stylesheets/main.css",
-    "build": "npm run clean && npm run copy && npm run build:core && npm run build:client&& npm run build:css"
+    "build": "npm run clean && npm run copy && npm run build:core && npm run build:client&& npm run build:css && npm run test",
+    "test": "mocha \"./bin/tests/**/*Test.js\""
   },
   "dependencies": {
     "@types/chart.js": "^2.7.42",
@@ -21,6 +22,7 @@
     "apicache": "^1.2.3",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
     "compression": "^1.7.3",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
@@ -31,6 +33,8 @@
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "googleapis": "^34.0.0",
+    "mocha": "^5.2.0",
+    "mocha-typescript": "^1.1.17",
     "moment": "^2.23.0",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.4",
