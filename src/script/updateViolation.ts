@@ -73,6 +73,14 @@ async function updateVideoViolation(video: Video) {
 
 }
 
+async function sleep(ms: number) {
+    await _sleep(ms);
+}
+
+function _sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 sequelize.authenticate()
 .then(async () => {
 
@@ -97,6 +105,7 @@ sequelize.authenticate()
     });
     for (const video of videoList) {
         await updateVideoViolation(video);
+        await sleep(150);
     }
 
     sequelize.close();
