@@ -3,8 +3,7 @@ import { Op } from "sequelize";
 import Statistics from "../../models/db/statistics";
 import Summary from "../../models/db/summary";
 import Video from "../../models/db/video";
-import VideoViolationDislike from "../../models/db/videoViolationDislike";
-import VideoViolationLike from "../../models/db/videoViolationLike";
+import Word from "../../models/db/word";
 
 export async function getVideoList(req: Request, res: Response) {
     const videoList = await Video.findAll({ limit: 50 });
@@ -44,6 +43,17 @@ export async function getTrendsVideoList(req: Request, res: Response) {
 }
 
 export async function getSummaryList(req: Request, res: Response) {
+    const summaryList = await Summary.findAll();
+    res.json(summaryList);
+}
+
+
+export async function getTrendsList(req: Request, res: Response) {
+
+
+
+    const videoList = await Word.findAll({});
+
     const summaryList = await Summary.findAll();
     res.json(summaryList);
 }

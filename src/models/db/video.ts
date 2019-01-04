@@ -7,6 +7,8 @@ import VideoStemmedWord from "./videoStemmedWord";
 import VideoTag from "./videoTag";
 import VideoViolationDislike from "./videoViolationDislike";
 import VideoViolationLike from "./videoViolationLike";
+import VideoWord from "./videoWord";
+import Word from "./word";
 
 @Table( {
     tableName: "videos",
@@ -81,4 +83,7 @@ export default class Video extends Model<Video> {
 
     @BelongsToMany(() => StemmedWord, () => VideoStemmedWord, "videoId")
     public stemmedWords: StemmedWord[];
+
+    @BelongsToMany(() => Word, () => VideoWord, "videoId")
+    public words: Word[];
 }

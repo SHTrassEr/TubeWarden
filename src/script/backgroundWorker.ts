@@ -24,13 +24,13 @@ const channelGrabber
 
 sequelize.authenticate()
     .then(() => {
-         schedule.scheduleJob(Config.Service.trends.cron, async () => {
+        schedule.scheduleJob(Config.Service.trends.cron, async () => {
             const videoList = await trendsGrabberService.process(Config.Google.maxResults);
             await channelGrabber.processEmptyTitle(Config.Google.maxResults);
             await summaryService.updateAll();
-         });
+        });
 
-         schedule.scheduleJob(Config.Service.statistics.cron, async () => {
+        schedule.scheduleJob(Config.Service.statistics.cron, async () => {
             await statisticsGrabberService.process(Config.Google.maxResults);
         });
     });

@@ -1,6 +1,7 @@
-import { BelongsToMany, Column, DataType, Model, Table } from "sequelize-typescript";
+import { BelongsToMany, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import Video from "./video";
 import VideoStemmedWord from "./videoStemmedWord";
+import Word from "./word";
 
 @Table({
     tableName: "stemmed_words",
@@ -19,6 +20,12 @@ export default class StemmedWord extends Model<StemmedWord> {
     @Column
     public title: string;
 
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    public videoCount: number;
+
     @BelongsToMany(() => Video, () => VideoStemmedWord, "stemmedWordId")
     public video: Video[];
+
+    @HasMany(() => Word)
+    public word: Word[];
 }

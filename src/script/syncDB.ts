@@ -3,7 +3,7 @@ import Video from "../models/db/video";
 
 import sequelize from "../sequelize";
 
-sequelize.sync()
+sequelize.sync({alter: true})
     .then(() => {
         Channel.findAll(). then (() => {
             Video.findAll()
