@@ -3,18 +3,23 @@ extends layout
 block content
   div.list-header
     h3 Все видео
-    p Все видео Youtube по которым собиралась статистика
+    p Все видео YouTube по которым собиралась статистика
 
 
-  div.row
-    div.col-lg-12
-      form(action=currentFilter.url method="GET")
+  form(action=currentFilter.url method="GET")
+    div.row
+      div.col-lg-12
         div.input-group
           input.form-control(type="text" name="s" placeholder="поиск по ключевым словам"  value=searchString)
           span.input-group-btn
             input.btn.btn-default(type="submit" value="Искать")
-
-  
+    div.row
+      div.col-lg-12
+        div.date-range.form-control
+          input.start(type="hidden" name="start" value=dateRange.startDate)
+          input.end(type="hidden" name="end" value=dateRange.endDate)
+          i.glyphicon.glyphicon-calendar
+          span &nbsp;
   div.row
     div.col-lg-12
       center

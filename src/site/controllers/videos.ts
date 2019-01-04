@@ -12,6 +12,8 @@ import Video from "../../models/db/video";
 import VideoViolationDislike from "../../models/db/videoViolationDislike";
 import VideoViolationLike from "../../models/db/videoViolationLike";
 
+import * as moment from "moment";
+
 import createPager from "../../utils/pager";
 import stemString from "../../utils/stemmer";
 
@@ -19,13 +21,18 @@ const summaryService = new SummaryService();
 
 const PAGE_SIZE = 30;
 
+interface IDateRange {
+    startDate: Date;
+    endDate: Date;
+}
+
 function createFilterList() {
     return [
         {
             title: "все",
             url: "/videos",
             summaryKey: SummaryKey.videoCount,
-            where: null,
+            where: { },
         },
         {
             title: "накрутка лайков",
@@ -60,17 +67,37 @@ function createFilterList() {
     ];
 }
 
-function getSearchString(req: Request) {
+function getSearchString(req: Request): string {
     return req.param("s", "");
+}
+
+function getDateRange(req: Request): IDateRange {
+    const dateRange: IDateRange = {
+        startDate: null,
+        endDate: null,
+    };
+
+    const start = moment(req.param("start", ""));
+    if (start.isValid()) {
+        dateRange.startDate = start.toDate();
+    }
+
+    const end = moment(req.param("end", ""));
+    if (end.isValid()) {
+        dateRange.endDate = end.toDate();
+    }
+
+    return dateRange;
 }
 
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {
 
     const searchString = getSearchString(req);
+    const dateRange = getDateRange(req);
     const includeKeyword = initKeywordFilter(searchString);
 
     let pager;
-    if (!includeKeyword) {
+    if (!includeKeyword && dateRange.startDate == null && dateRange.endDate == null) {
         const videoCount = await summaryService.getValue(currentFilter.summaryKey);
         pager = createPager(videoCount, parseInt(req.params.pageNum, 10), PAGE_SIZE);
     } else {
@@ -90,18 +117,31 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
         include.push(includeKeyword);
     }
 
-    const videoList = await Video.findAll({
+    const where = currentFilter.where;
 
+    if (dateRange.startDate != null) {
+        where.trendsAt = {[Op.gt]: moment(dateRange.startDate).subtract(1, "d").toDate()};
+    }
+
+    if (dateRange.endDate != null) {
+        if (!where.trendsAt) {
+            where.trendsAt = {};
+        }
+
+        where.trendsAt[Op.lt] = moment(dateRange.endDate).add(1, "d").toDate();
+    }
+
+    const videoList = await Video.findAll({
         include,
         offset: pager.offset,
         limit: pager.pageSize,
         order: [
             ["createdAt", "DESC"],
         ],
-        where: currentFilter.where,
+        where,
     });
 
-    res.render("videos", { videoList, pager, filterList, currentFilter, searchString });
+    res.render("videos", { videoList, pager, filterList, currentFilter, searchString, dateRange });
 }
 
 function initKeywordFilter(filter: string) {

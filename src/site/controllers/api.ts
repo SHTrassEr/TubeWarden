@@ -46,14 +46,3 @@ export async function getSummaryList(req: Request, res: Response) {
     const summaryList = await Summary.findAll();
     res.json(summaryList);
 }
-
-
-export async function getTrendsList(req: Request, res: Response) {
-
-
-
-    const videoList = await Word.findAll({});
-
-    const summaryList = await Summary.findAll();
-    res.json(summaryList);
-}

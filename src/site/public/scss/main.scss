@@ -26,5 +26,21 @@ body {
 .tag {
   margin-right: 14px;
 }
+
+.date-range {
+  background: #fff; 
+  cursor: pointer; 
+  padding: 5px 10px; 
+  border: 1px solid #ccc; 
+  width: 100%
+}
+
+.date-range span {
+  margin: 0 10px
+}
+
+.input-group {
+  padding-bottom: 1px;
+}
   
   
