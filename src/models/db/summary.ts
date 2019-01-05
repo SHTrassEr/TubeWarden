@@ -1,6 +1,4 @@
 import { BelongsToMany, Column, DataType, Model, Table } from "sequelize-typescript";
-import Video from "./video";
-import VideoTag from "./videoTag";
 
 @Table({
     tableName: "summary",

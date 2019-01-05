@@ -75,15 +75,15 @@ export default class Video extends Model<Video> {
     @HasOne(() => VideoViolationDislike)
     public violationDislike: VideoViolationDislike;
 
-    @BelongsTo(() => Channel, "channelId")
+    @BelongsTo(() => Channel)
     public channel: Channel;
 
-    @BelongsToMany(() => Tag, () => VideoTag, "videoId")
+    @BelongsToMany(() => Tag, () => VideoTag)
     public tags: Tag[];
 
-    @BelongsToMany(() => StemmedWord, () => VideoStemmedWord, "videoId")
+    @BelongsToMany(() => StemmedWord, () => VideoStemmedWord)
     public stemmedWords: StemmedWord[];
 
-    @BelongsToMany(() => Word, () => VideoWord, "videoId")
+    @BelongsToMany(() => Word, () => VideoWord)
     public words: Word[];
 }

@@ -23,7 +23,7 @@ export default class StemmedWord extends Model<StemmedWord> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     public videoCount: number;
 
-    @BelongsToMany(() => Video, () => VideoStemmedWord, "stemmedWordId")
+    @BelongsToMany(() => Video, () => VideoStemmedWord)
     public video: Video[];
 
     @HasMany(() => Word)

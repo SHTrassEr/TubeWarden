@@ -19,6 +19,6 @@ export default class Tag extends Model<Tag> {
     @Column
     public title: string;
 
-    @BelongsToMany(() => Video, () => VideoTag, "tagId")
+    @BelongsToMany(() => Video, () => VideoTag)
     public video: Video[];
 }
