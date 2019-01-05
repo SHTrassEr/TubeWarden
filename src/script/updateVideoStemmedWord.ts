@@ -2,7 +2,7 @@ import sequelize from "../sequelize";
 
 import { Op } from "sequelize";
 
-import StemmedWordService from "../core/service/stemmedWordService";
+import WordService from "../core/service/wordService";
 
 import StemmedWord from "../models/db/stemmedWord";
 import Video from "../models/db/video";
@@ -10,7 +10,7 @@ import Word from "../models/db/word";
 
 import createPager from "../utils/pager";
 
-const stemmedWordService = new StemmedWordService();
+const wordService = new WordService();
 
 async function process(): Promise<any> {
 
@@ -32,7 +32,7 @@ async function process(): Promise<any> {
         });
 
         for (const video of videoList) {
-            await stemmedWordService.updateVideo(video.videoId);
+            await wordService.updateVideo(video.videoId);
         }
         currentPage = pager.previousPage;
     } while (currentPage);

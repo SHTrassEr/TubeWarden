@@ -49,12 +49,10 @@ function initDateRangeList() {
         }
     }
 
-    $(".date-range"). each((index, element) => {
-
+    $(".date-range").each((index, element) => {
         const $element = $(element);
         const startDate = moment($element.children("input.start").val());
         const endDate = moment($element.children("input.end").val());
-
         const options: daterangepicker.Options = {
             autoUpdateInput: false,
             ranges: {

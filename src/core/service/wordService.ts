@@ -5,7 +5,7 @@ import Word from "../../models/db/word";
 
 import { getWordList, stemWord } from "../../utils/stemmer";
 
-export default class StemmedWordService {
+export default class WordService {
 
     public async updateVideo(videoId: string) {
         const video = await Video.findByPrimary(videoId, {include: [Tag]});

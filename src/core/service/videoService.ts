@@ -5,30 +5,30 @@ import VideoViolationDislike from "../../models/db/videoViolationDislike";
 import VideoViolationLike from "../../models/db/videoViolationLike";
 import ChannelService from "./channelService";
 import GoogleVideoService from "./googleVideoService";
-import StemmedWordService from "./stemmedWordService";
 import SummaryService from "./summaryService";
 import { SummaryKey } from "./summaryService";
 import TagService from "./tagService";
+import WordService from "./wordService";
 
 export default class VideoService {
 
     protected channelService: ChannelService;
     protected tagService: TagService;
     protected summaryService: SummaryService;
-    protected stemmedWordService: StemmedWordService;
+    protected wordService: WordService;
 
     constructor() {
         this.channelService = new ChannelService();
         this.tagService = new TagService();
         this.summaryService = new SummaryService();
-        this.stemmedWordService = new StemmedWordService();
+        this.wordService = new WordService();
     }
 
     public async updateVideo(video: Video, videoInfo: youtube_v3.Schema$Video) {
         video.title = videoInfo.snippet.title;
         await this.updateVideoChannelId(video, videoInfo.snippet.channelId);
         await this.setVideoTagTitleList(video, videoInfo.snippet.tags);
-        await this.stemmedWordService.setVideoStemmedWordList(video);
+        await this.wordService.setVideoStemmedWordList(video);
 
         if (video.changed()) {
             await video.save();
@@ -50,7 +50,7 @@ export default class VideoService {
         await VideoViolationDislike.create({videoId: video.videoId});
         await this.summaryService.increment(SummaryKey.videoCount, 1);
         await this.setVideoTagTitleList(video, videoInfo.snippet.tags);
-        await this.stemmedWordService.updateVideo(video.videoId);
+        await this.wordService.updateVideo(video.videoId);
         return video;
     }
 

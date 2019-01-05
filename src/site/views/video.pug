@@ -21,7 +21,12 @@ block content
             small
               each tag, tagIndex in video.tags
                 a.tag(href="/videos?s=" + tag.title)= tag.title
-              
+      if (video.trendsAt)
+        p В трендах: 
+          i.date-time-value(data-value=video.trendsAt)
+      if (video.statisticsUpdatedAt)
+        p Обновлено: 
+          i.date-time-value(data-value=video.statisticsUpdatedAt)
       if video.deletedAt
         p 
           i Удалено: 

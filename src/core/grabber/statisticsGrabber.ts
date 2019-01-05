@@ -34,9 +34,11 @@ export default class StatisticsGrabber {
         const videoList = await Video.findAll({
             include: [{
                 model: VideoViolationLike,
+                required: true,
             },
             {
                 model: VideoViolationDislike,
+                required: true,
             }],
             limit: maxResults,
             where: {
@@ -80,7 +82,8 @@ export default class StatisticsGrabber {
             await statistics.save();
             statisticsList.push(statistics);
         }
-        this.updateVideo(video, statisticsList);
+
+        await this.updateVideo(video, statisticsList);
 
         return video;
     }
