@@ -13,7 +13,6 @@ export default class Config {
             supportBigNumbers: true,
             bigNumberStrings: true,
             charset: "utf8mb4",
-            collate: "utf8mb4_unicode_ci",
         },
 
         debug: true,
@@ -43,6 +42,7 @@ export default class Config {
         key: __dirname + "/../../cert/TubeWarden/private.key",
         cert: __dirname + "/../../cert/TubeWarden/certificate.crt",
         ca: __dirname + "/../../cert/TubeWarden/ca_bundle.pem",
+        port: 443,
     };
 
     public static Google = {

@@ -17,24 +17,29 @@ if (Config.SSL.key && fs.existsSync(Config.SSL.key)) {
     };
 }
 
-let port: number = app.get("port");
+const port: number = app.get("port");
 let server: net.Server  = null;
 
 sequelize.sync()
 .then(() => {
     if (sslConf) {
+        let sslPort = Config.SSL.port;
+        if (!sslPort) {
+            sslPort = 443;
+        }
+
         http.createServer((req: any, res: any) => {
             res.writeHead(301, { Location: "https://" + req.headers.host + req.url });
             res.end();
         }).listen(port);
 
-        port = 443;
         server = https.createServer(sslConf, app);
+        server.listen(sslPort);
     } else {
         server = http.createServer(app);
+        server.listen(port);
     }
 
-    server.listen(port);
     server.on("error", onError);
     server.on("listening", onListening);
 });
