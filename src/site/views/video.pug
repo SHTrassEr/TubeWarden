@@ -23,6 +23,8 @@ block content
                 a.tag(href="/videos?s=" + tag.title)= tag.title
       if (video.trendsAt)
         p В трендах: 
+          i.date-time-value(data-value=video.createdAt)
+          i  - 
           i.date-time-value(data-value=video.trendsAt)
       if (video.statisticsUpdatedAt)
         p Обновлено: 

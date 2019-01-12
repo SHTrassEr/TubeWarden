@@ -180,8 +180,6 @@ declare const videoId: string;
                 chart.series[3].data.push([date, 0 ]);
                 chart.series[4].data.push([date, 0 ]);
             }
-
-
         }
     }
 
