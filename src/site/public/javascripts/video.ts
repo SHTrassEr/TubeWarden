@@ -237,7 +237,9 @@ declare const videoId: string;
             title: {
                 text: "",
             },
-
+            time: {
+                useUTC: false,
+            },
             xAxis: {
                 type: "datetime",
                 title: {
@@ -256,7 +258,6 @@ declare const videoId: string;
         return Highcharts.chart(container, chart);
     }
 
-
     function initDeltaChart(data, container) {
 
         const chart: any = {
@@ -272,7 +273,9 @@ declare const videoId: string;
             title: {
                 text: "",
             },
-
+            time: {
+                useUTC: false,
+            },
             xAxis: {
                 type: "datetime",
                 title: {
