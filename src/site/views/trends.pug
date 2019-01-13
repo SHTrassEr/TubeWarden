@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  div.list-header
+    h3 Тренды
+    p  
+
+
+  div
+    div.row
+      div.col-lg-12
+        div.input-group
+          input.form-control(type="text" name="s" placeholder="тренды по по ключевым словам"  value=searchString)
+          span.input-group-btn
+            input.btn.btn-default(type="submit" value="Искать")
+    div.row
+      div.col-lg-12
+        div.date-range.form-control
+          input.start(type="hidden" name="start" value=dateRange.startDate)
+          input.end(type="hidden" name="end" value=dateRange.endDate)
+          i.glyphicon.glyphicon-calendar
+          span &nbsp;
+
+  p
+    div#trendsChart(style="width:100%; height:500px;")

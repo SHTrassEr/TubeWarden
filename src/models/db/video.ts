@@ -19,6 +19,7 @@ import Word from "./word";
         { unique: false, fields: ["nextStatisticsUpdateAt"] },
         { unique: false, fields: ["trendsAt", "createdAt"] },
         { unique: false, fields: ["createdAt"] },
+        { unique: false, fields: ["trendsNow"] },
         { unique: false, fields: ["channelId", "createdAt"] },
         { unique: false, fields: ["violationIndexLike", "createdAt"] },
         { unique: false, fields: ["violationIndexDislike", "createdAt"] },
@@ -52,6 +53,9 @@ export default class Video extends Model<Video> {
 
     @Column({ defaultValue: false })
     public deleted: boolean;
+
+    @Column({ defaultValue: false })
+    public trendsNow: boolean;
 
     @Column(DataType.DATE)
     public deletedAt: Date;

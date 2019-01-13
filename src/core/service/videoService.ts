@@ -63,6 +63,12 @@ export default class VideoService {
         }
     }
 
+    public async updateTrendsNowStatus(trendsIdList: string[]): Promise<number> {
+        const videoList = await Video.findAll({where: { videoId: trendsIdList }});
+
+        return videoList.length;
+    }
+
     protected async setVideoTagTitleList(video: Video, tagTitleList: string[]): Promise<Video> {
         const tagList = await this.tagService.getOrCreateTagList(tagTitleList);
         await video.$set("tags", tagList);

@@ -13,7 +13,7 @@ export default class WordService {
         await video.save();
     }
 
-    public async setVideoStemmedWordList(video: Video) {
+    public async setVideoStemmedWordList(video: Video): Promise<Video> {
 
         const titleList = [video.title];
         if (video.tags.length > 0) {
@@ -37,6 +37,8 @@ export default class WordService {
         if (stemmedWordIdList && stemmedWordIdList.length > 0) {
             await StemmedWord.update({ videoCount: StemmedWord.sequelize.literal("videoCount + 1") }, { where: { id: stemmedWordIdList} });
         }
+
+        return video;
     }
 
     protected createStemmedWordIdList(wordEntityList: Word[]): number[] {

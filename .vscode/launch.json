@@ -58,6 +58,12 @@
             "request": "launch",
             "name": "updateVideoStemmedWord",
             "program": "${workspaceFolder}/bin/script\\updateVideoStemmedWord.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "updateVideoTrendWord",
+            "program": "${workspaceFolder}/bin/script\\updateVideoTrendWord.js"
         }
 
     ]
