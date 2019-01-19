@@ -37,8 +37,8 @@ function initDateRangeList() {
 
         if (startDate.isValid() && endDate.isValid()) {
             $element.children("span").html(formatDate(start) + " - " + formatDate(end));
-            $element.children("input.start").val(moment(start).format("YYYY-MM-DD"));
-            $element.children("input.end").val(moment(end).format("YYYY-MM-DD"));
+            $element.children("input.start").val(moment(start).toISOString());
+            $element.children("input.end").val(moment(end).toISOString());
             if (!startDate.isSame(prevStart) || !endDate.isSame(prevEnd)) {
                 $element.closest("form").submit();
             }

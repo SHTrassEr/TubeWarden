@@ -10,16 +10,22 @@ block content
     div.row
       div.col-lg-12
         div.input-group
-          input.form-control(type="text" name="s" placeholder="тренды по по ключевым словам"  value=searchString)
+          input.form-control(type="text" name="s" placeholder="тренды по по ключевым словам" id="tbQuery"  value=searchString)
           span.input-group-btn
-            input.btn.btn-default(type="submit" value="Искать")
+            input.btn.btn-default(type="submit" value="Показать" id="btnSubmit")
     div.row
       div.col-lg-12
         div.date-range.form-control
-          input.start(type="hidden" name="start" value=dateRange.startDate)
-          input.end(type="hidden" name="end" value=dateRange.endDate)
+          input.start(type="hidden" name="start" id="dStart" value=dateRange.startDate)
+          input.end(type="hidden" name="end" id="dEnd" value=dateRange.endDate)
           i.glyphicon.glyphicon-calendar
           span &nbsp;
 
   p
     div#trendsChart(style="width:100%; height:500px;")
+
+block script
+  script(src='//code.highcharts.com/highcharts.js')
+  script(src='//code.highcharts.com/modules/annotations.js') 
+
+  script(src='/javascripts/trends.js')

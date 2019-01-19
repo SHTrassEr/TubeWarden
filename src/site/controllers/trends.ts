@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
-import * as moment from "moment";
+
+import DateRange from "../../core/entity/DateRange";
 
 function getSearchString(req: Request): string {
     return req.param("s", "");
 }
 
+function getDateRange(req: Request): DateRange {
+    return new DateRange(req.param("start", ""), req.param("end", ""));
+}
+
 export async function getTrends(req: Request, res: Response) {
-    const startDate = null;
-    const endDate = null;
-    const searchString = "";
-    res.render("trends", {searchString, dateRange: {startDate, endDate}});
+    const dateRange = getDateRange(req);
+    const searchString = getSearchString(req);
+    res.render("trends", {searchString, dateRange });
 }

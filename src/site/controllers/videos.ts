@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import { IIncludeOptions } from "sequelize-typescript/lib/interfaces/IIncludeOptions";
 
 import { Request, Response } from "express";
+import DateRange from "../../core/entity/DateRange";
 import SummaryService from "../../core/service/summaryService";
 import { SummaryKey } from "../../core/service/summaryService";
 import StemmedWord from "../../models/db/stemmedWord";
@@ -20,11 +21,6 @@ import stemString from "../../utils/stemmer";
 const summaryService = new SummaryService();
 
 const PAGE_SIZE = 30;
-
-interface IDateRange {
-    startDate: Date;
-    endDate: Date;
-}
 
 function createFilterList() {
     return [
@@ -71,23 +67,8 @@ function getSearchString(req: Request): string {
     return req.param("s", "");
 }
 
-function getDateRange(req: Request): IDateRange {
-    const dateRange: IDateRange = {
-        startDate: null,
-        endDate: null,
-    };
-
-    const start = moment(req.param("start", ""));
-    if (start.isValid()) {
-        dateRange.startDate = start.toDate();
-    }
-
-    const end = moment(req.param("end", ""));
-    if (end.isValid()) {
-        dateRange.endDate = end.toDate();
-    }
-
-    return dateRange;
+function getDateRange(req: Request): DateRange {
+    return new DateRange(req.param("start", ""), req.param("end", ""));
 }
 
 async function getVideoList(req: Request, res: Response, filterList, currentFilter) {

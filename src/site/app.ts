@@ -60,6 +60,7 @@ app.get("/video/:videoId", videoController.getVideo);
 app.get("/channel/:channelId", channelController.getChannel);
 app.get("/trends", trendsController.getTrends);
 app.get("/api/trendsVideoList", cors(), apiController.getTrendsVideoList);
+app.get("/api/trendsWordList", cors(), apiController.getWordListTrends);
 app.get("/api/summaryList", cors(), apiController.getSummaryList);
 app.get("/api/statistics/:videoId", cors(), apiController.getStatisticsByVideo);
 

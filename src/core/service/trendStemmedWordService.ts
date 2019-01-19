@@ -1,6 +1,6 @@
 import StemmedWord from "../../models/db/stemmedWord";
 import Tag from "../../models/db/tag";
-import TrendStemmedWord from "../../models/db/TrendStemmedWord";
+import TrendStemmedWord from "../../models/db/trendStemmedWord";
 import Video from "../../models/db/video";
 import Word from "../../models/db/word";
 

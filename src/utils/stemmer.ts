@@ -4,9 +4,13 @@ const stemmer = new snowballStemmer.RussianStemmer();
 const spaceRegExp = new RegExp(/[\u200B-\u200D\uFEFF]/g);
 
 export function getWordList(s: string): string[] {
-    return s.toLowerCase().split(/[“”—\@\/\*\]\[\{\}\)\(\?\!\#\:'" ,«»\.\|-]+/)
+    if (s) {
+        return s.toLowerCase().split(/[“”—\@\/\*\]\[\{\}\)\(\?\!\#\:'" ,«»\.\|-]+/)
         .map((w) => w.replace(spaceRegExp, ""))
         .filter((w) => w && w.length > 2);
+    }
+
+    return [];
 }
 
 export function stemWordList(wordList: string[]): string[] {
