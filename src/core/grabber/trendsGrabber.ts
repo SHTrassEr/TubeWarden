@@ -75,9 +75,9 @@ export default class TrendsGrabber {
     protected async updateVideoTrendsNowStatus(video: Video, trendsNow: boolean, date: Date): Promise<Video> {
         if (video.trendNow !== trendsNow) {
             if (trendsNow) {
-                // await this.trendWordService.addVideoTrendsWordList(video, date);
+                await this.trendWordService.addVideoTrendsWordList(video, date);
             } else {
-                // await this.trendWordService.removeVideoTrendsWordList(video, date);
+                await this.trendWordService.removeVideoTrendsWordList(video, date);
             }
 
             video.trendNow = trendsNow;
