@@ -93,5 +93,9 @@
 
     $(document).ready(() => {
         $("#btnSubmit").click(updateChart);
+
+        if (getQuery()) {
+            updateChart();
+        }
     });
 })();
