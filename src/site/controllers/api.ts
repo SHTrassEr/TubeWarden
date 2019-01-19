@@ -98,7 +98,9 @@ async function getWordTrends(stemmedWord: string, dateRange: DateRange) {
         }
 
         const startDate = dateRange.startDate ? dateRange.startDate : trendStemmedWordList[0].date;
+        startDate.setHours(0, 0, 0, 0);
         const endDate = dateRange.endDate ? dateRange.endDate : new Date();
+        startDate.setHours(23, 59, 59, 0);
         const interval = trendsInterval;
         const data = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
         return {startDate, endDate, interval, data};
