@@ -1,4 +1,4 @@
-import { youtube_v3 } from "googleapis";
+import { Op } from "sequelize";
 
 import StemmedWord from "../../models/db/stemmedWord";
 import Video from "../../models/db/video";
@@ -30,7 +30,6 @@ export default class TrendsGrabber {
         if (trendsIdList && trendsIdList.length > 0) {
             const videoList = await Video.findAll({where: { videoId: trendsIdList }});
             const videoIdList = videoList.map((v) => v.videoId);
-            await this.updateVideoList(videoIdList);
             const videoIdSet = new Set<string>(videoIdList);
             const newVideoIdList = trendsIdList.filter((videoId) => !videoIdSet.has(videoId));
             await this.createVideoList(newVideoIdList);
@@ -56,33 +55,39 @@ export default class TrendsGrabber {
 
     protected async updateTrendsNowStatus(trendsIdList: string[]): Promise<number> {
         const date = new Date();
-        for (const videoId of trendsIdList) {
-            const video = await Video.findByPrimary(videoId, {include: [StemmedWord, Word]});
-            if (video != null) {
-                video.trendsAt = date;
-                video.deleted = false;
-                video.trendsNow = true;
-                await video.save();
-            }
+        const trendsIdSet = new Set<string> (trendsIdList);
+        Video.update({trendsAt: date, deleted: false}, {where: {trendNow: true, videoId: trendsIdList}});
+
+        const oldTrendsVideoList = await Video.findAll({where: {trendNow: true, videoId: {[Op.notIn]: trendsIdList}},
+            include: [StemmedWord, Word]});
+        for (const video of oldTrendsVideoList) {
+            await this.updateVideoTrendsNowStatus(video, false, date);
+        }
+
+        const newTrendsVideoList = await Video.findAll({where: {trendNow: false, videoId: trendsIdList}, include: [StemmedWord, Word]});
+        for (const video of newTrendsVideoList) {
+            await this.updateVideoTrendsNowStatus(video, true, date);
         }
 
         return trendsIdList.length;
     }
 
     protected async updateVideoTrendsNowStatus(video: Video, trendsNow: boolean, date: Date): Promise<Video> {
-        if (video.trendsNow !== trendsNow) {
+        if (video.trendNow !== trendsNow) {
             if (trendsNow) {
                 // await this.trendWordService.addVideoTrendsWordList(video, date);
             } else {
                 // await this.trendWordService.removeVideoTrendsWordList(video, date);
             }
 
-            video.trendsNow = trendsNow;
+            video.trendNow = trendsNow;
         }
 
-        video.trendsAt = date;
-        video.deleted = false;
-        video.trendsNow = true;
+        if (trendsNow) {
+            video.trendsAt = date;
+            video.deleted = false;
+        }
+
         await video.save();
         return video;
     }

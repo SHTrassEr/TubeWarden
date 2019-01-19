@@ -4,44 +4,66 @@ import StemmedWord from "../models/db/stemmedWord";
 import Video from "../models/db/video";
 import Word from "../models/db/word";
 
-import Config from "../config";
-import ChannelGrabber from "../core/grabber/channelGrabber";
-import VideoGrabber from "../core/grabber/videoGrabber";
 import sequelize from "../sequelize";
 
+import { VideoTrendProcessStatus } from "../core/entity/VideoTrendProcessStatus";
 import TrendStemmedWordService from "../core/service/trendStemmedWordService";
-
-import createPager from "../utils/pager";
 
 const trendStemmedWordService = new TrendStemmedWordService();
 
 interface IVideoData {
+    isStartDate: string;
     videoId: string;
     date: Date;
 }
 
+async function sleep(ms: number) {
+    await _sleep(ms);
+}
+
+function _sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function process(): Promise<any> {
 
-    const dataList: IVideoData[] = await sequelize.query(`select s.videoId, s.createdAt as date from videos s where s.trendsAt is not null
+    const dataList: IVideoData[] = await sequelize.query(`select s.videoId, s.createdAt as date, 1 as isStartDate from videos s
+    where s.trendsAt is not null and s.trendProcessStatus = 0
     union all
     select e.videoId,
     (case
     when e.trendsAt = e.createdAt then ADDTIME(e.trendsAt, '0:5:0.0')
     else e.trendsAt
-    end) as date from videos e where e.trendsAt is not null order by date, videoId;`,
+    end) as date, 0 as isStartDate from videos e where e.trendsAt is not null and e.trendNow = 0
+    and (e.trendProcessStatus = 0 or e.trendProcessStatus = 1)
+    order by date, videoId;`,
     { type: sequelize.QueryTypes.SELECT});
 
     const videoIdSet = new Map<string, Video>();
     for (const data of dataList) {
+        let video: Video;
         if (videoIdSet.has(data.videoId)) {
-            await trendStemmedWordService.removeVideoTrendsWordList(videoIdSet.get(data.videoId), data.date);
-            videoIdSet.delete(data.videoId);
+            video = videoIdSet.get(data.videoId);
         } else {
-            const video = await Video.findById(data.videoId, {include: [StemmedWord]});
+            video = await Video.findById(data.videoId, {include: [StemmedWord]});
             if (video != null) {
                 videoIdSet.set(video.videoId, video);
-                await trendStemmedWordService.addVideoTrendsWordList(video, data.date);
             }
+        }
+
+        if (video != null) {
+            if (data.isStartDate === "1") {
+                await trendStemmedWordService.addVideoTrendsWordList(video, data.date);
+                video.trendProcessStatus = VideoTrendProcessStatus.Start;
+                await video.save();
+            } else {
+                await trendStemmedWordService.removeVideoTrendsWordList(video, data.date);
+                video.trendProcessStatus = VideoTrendProcessStatus.End;
+                await video.save();
+                videoIdSet.delete(data.videoId);
+            }
+
+            await sleep(60);
         }
     }
 }

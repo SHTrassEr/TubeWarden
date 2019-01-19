@@ -22,15 +22,33 @@ const statisticsGrabberService
 const channelGrabber
     = new ChannelGrabber(googleVideoService);
 
+let trendsGrabberInProcess = false;
+let statisticsGrabberInProcess = false;
+
 sequelize.authenticate()
     .then(() => {
         schedule.scheduleJob(Config.Service.trends.cron, async () => {
-            const videoList = await trendsGrabberService.process(Config.Google.maxResults);
-            await channelGrabber.processEmptyTitle(Config.Google.maxResults);
-            await summaryService.updateAll();
+            if (!trendsGrabberInProcess) {
+                trendsGrabberInProcess = true;
+                try {
+                    const videoList = await trendsGrabberService.process(Config.Google.maxResults);
+                    await channelGrabber.processEmptyTitle(Config.Google.maxResults);
+                    await summaryService.updateAll();
+                } finally {
+                    trendsGrabberInProcess = false;
+                }
+            }
         });
 
         schedule.scheduleJob(Config.Service.statistics.cron, async () => {
-            await statisticsGrabberService.process(Config.Google.maxResults);
+            if (!statisticsGrabberInProcess) {
+                statisticsGrabberInProcess = true;
+                try {
+                    await statisticsGrabberService.process(Config.Google.maxResults);
+                } finally {
+                    statisticsGrabberInProcess = false;
+                }
+
+            }
         });
     });

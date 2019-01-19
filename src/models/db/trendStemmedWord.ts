@@ -20,7 +20,10 @@ export default class TrendStemmedWord extends Model<TrendStemmedWord> {
     public videoCount: number;
 
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    public videoDelta: number;
+    public added: number;
+
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    public removed: number;
 
     @BelongsTo(() => StemmedWord)
     public stemmedWord: StemmedWord;

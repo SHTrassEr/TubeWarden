@@ -1,5 +1,7 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasOne, Model, Table } from "sequelize-typescript";
 
+import {VideoTrendProcessStatus} from "../../core/entity/VideoTrendProcessStatus";
+
 import Channel from "./channel";
 import StemmedWord from "./stemmedWord";
 import Tag from "./tag";
@@ -19,7 +21,7 @@ import Word from "./word";
         { unique: false, fields: ["nextStatisticsUpdateAt"] },
         { unique: false, fields: ["trendsAt", "createdAt"] },
         { unique: false, fields: ["createdAt"] },
-        { unique: false, fields: ["trendsNow"] },
+        { unique: false, fields: ["trendNow"] },
         { unique: false, fields: ["channelId", "createdAt"] },
         { unique: false, fields: ["violationIndexLike", "createdAt"] },
         { unique: false, fields: ["violationIndexDislike", "createdAt"] },
@@ -55,7 +57,10 @@ export default class Video extends Model<Video> {
     public deleted: boolean;
 
     @Column({ defaultValue: false })
-    public trendsNow: boolean;
+    public trendNow: boolean;
+
+    @Column({ type: DataType.TINYINT, defaultValue: 0 })
+    public trendProcessStatus: VideoTrendProcessStatus;
 
     @Column(DataType.DATE)
     public deletedAt: Date;

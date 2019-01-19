@@ -54,7 +54,7 @@ function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, d
     let currentTrend = trendStemmedWordList[index];
 
     if (currentTrend.date.getTime() > date) {
-        return [index, (currentTrend.videoCount - currentTrend.videoDelta)];
+        return [index, (currentTrend.videoCount - (currentTrend.added - currentTrend.removed))];
     }
 
     let i = index;

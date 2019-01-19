@@ -12,7 +12,7 @@ export default class TrendStemmedWordService {
         await this.getOrCreateTrendWordList(stemmedWordIdList, d);
         await TrendStemmedWord.update({
             videoCount: Word.sequelize.literal("videoCount + 1"),
-            videoDelta: Word.sequelize.literal("videoDelta + 1"),
+            added: Word.sequelize.literal("added + 1"),
         }, { where: { stemmedWordId: stemmedWordIdList, date: d} });
 
         return video;
@@ -24,7 +24,7 @@ export default class TrendStemmedWordService {
         await this.getOrCreateTrendWordList(stemmedWordIdList, d);
         await TrendStemmedWord.update({
             videoCount: Word.sequelize.literal("videoCount - 1"),
-            videoDelta: Word.sequelize.literal("videoDelta - 1"),
+            removed: Word.sequelize.literal("removed + 1"),
         }, { where: { stemmedWordId: stemmedWordIdList, date: d} });
 
         return video;
@@ -75,7 +75,7 @@ export default class TrendStemmedWordService {
         }
 
         if (oldTrendWord.date < date) {
-            if (oldTrendWord.videoCount === 0 && oldTrendWord.videoDelta === 0) {
+            if (oldTrendWord.videoCount === 0 && oldTrendWord.added === 0 && oldTrendWord.removed === 0) {
                 oldTrendWord.date = date;
                 await oldTrendWord.save();
                 return oldTrendWord;
