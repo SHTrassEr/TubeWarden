@@ -50,34 +50,46 @@ export async function getSummaryList(req: Request, res: Response) {
     res.json(summaryList);
 }
 
-function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, date: number): [number, number] {
+function getTrendValue(videoCount: number, startDate: number,  endDate: number): number {
+    const hours = (endDate - startDate) / (1000 * 60 * 60);
+    return hours * videoCount;
+}
+
+function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, startDate: number,  endDate: number): [number, number] {
     let currentTrend = trendStemmedWordList[index];
 
-    if (currentTrend.date.getTime() > date) {
-        return [index, (currentTrend.videoCount - (currentTrend.added - currentTrend.removed))];
+    while (index < (trendStemmedWordList.length - 1) &&  currentTrend.date.getTime() <= startDate ) {
+        currentTrend = trendStemmedWordList[++index];
     }
 
-    let i = index;
-    let maxValue = currentTrend.videoCount;
+    if (currentTrend.date.getTime() <= startDate) {
+        return [index, getTrendValue(currentTrend.videoCount, startDate, endDate)];
+    }
 
+    if (currentTrend.date.getTime() >= endDate) {
+        const videoCount = currentTrend.videoCount - (currentTrend.added - currentTrend.removed);
+        return [index, getTrendValue(videoCount, startDate, endDate)];
+    }
+
+    let value = 0;
     do {
-        currentTrend = trendStemmedWordList[i++];
-        if (maxValue < currentTrend.videoCount) {
-            maxValue = currentTrend.videoCount;
+        value = getTrendValue(currentTrend.videoCount, startDate, Math.min(currentTrend.date.getTime(), endDate));
+        if (index < (trendStemmedWordList.length - 1)) {
+            currentTrend = trendStemmedWordList[++index];
         }
-    }while (currentTrend.date.getTime() <= date && i < trendStemmedWordList.length);
+    } while (index < (trendStemmedWordList.length - 1) && currentTrend.date.getTime() <= endDate);
 
-    return [Math.min(i, trendStemmedWordList.length - 1), maxValue];
+    return [index, value];
 }
 
 function createTrendsData(trendStemmedWordList: TrendStemmedWord[], interval: number, startDate: Date, endDate: Date): number[] {
     const result: number[] = [];
     if (trendStemmedWordList.length > 0) {
         let trendIndex = 0;
-        let maxValue = 0;
-        for (let d = startDate.getTime(); d <= endDate.getTime(); d += interval) {
-            [trendIndex, maxValue] = getNextTrend(trendStemmedWordList, trendIndex, d);
-            result.push(maxValue);
+        let value = 0;
+        for (let d = startDate.getTime() - interval; d < endDate.getTime(); d += interval) {
+            [trendIndex, value] = getNextTrend(trendStemmedWordList, trendIndex, d, (d + interval));
+            result.push(Math.floor(value));
         }
     }
     return result;

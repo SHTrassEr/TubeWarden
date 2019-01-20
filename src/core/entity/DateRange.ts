@@ -13,7 +13,8 @@ export default class DateRange implements IDateRange {
         if (date instanceof Date) {
             return date;
         } else if (date) {
-            const d = moment(date);
+            const n = Number(date);
+            const d = moment(n ? n : date);
             if (d.isValid()) {
                 return d.toDate();
             }

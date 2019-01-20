@@ -29,7 +29,7 @@ function initDateTimeListValue() {
 
 function initDateRangeList() {
 
-    function setDate($element, start, end) {
+    function setDate($element: JQuery<HTMLElement>, start, end) {
         const startDate = moment(start);
         const endDate = moment(end);
         const prevStart = moment($element.children("input.start").val());
@@ -40,6 +40,7 @@ function initDateRangeList() {
             $element.children("input.start").val(moment(start).toISOString());
             $element.children("input.end").val(moment(end).toISOString());
             if (!startDate.isSame(prevStart) || !endDate.isSame(prevEnd)) {
+                $element.trigger("date-range:changed");
                 $element.closest("form").submit();
             }
         } else {

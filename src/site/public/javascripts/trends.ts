@@ -69,7 +69,7 @@
 
     function getDateRange() {
         const start = moment($("#dStart").val() as string);
-        const end = moment($("#dStart").val() as string);
+        const end = moment($("#dEnd").val() as string);
         return {
             startDate: start.isValid() ? start.valueOf() : null,
             endDate: end.isValid() ? end.valueOf() : null,
@@ -93,6 +93,16 @@
 
     $(document).ready(() => {
         $("#btnSubmit").click(updateChart);
+
+        $(".date-range").on("date-range:changed", (e) => {
+            updateChart();
+        });
+
+        $("#tbQuery").on("keypress", (e) => {
+            if (e.which === 13) {
+                updateChart();
+            }
+        });
 
         if (getQuery()) {
             updateChart();

@@ -101,7 +101,7 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
     const where = currentFilter.where;
 
     if (dateRange.startDate != null) {
-        where.trendsAt = {[Op.gt]: moment(dateRange.startDate).subtract(1, "d").toDate()};
+        where.trendsAt = { [Op.gte]: dateRange.startDate };
     }
 
     if (dateRange.endDate != null) {
@@ -109,7 +109,7 @@ async function getVideoList(req: Request, res: Response, filterList, currentFilt
             where.trendsAt = {};
         }
 
-        where.trendsAt[Op.lt] = moment(dateRange.endDate).add(1, "d").toDate();
+        where.createdAt = { [Op.lte] : dateRange.endDate };
     }
 
     const videoList = await Video.findAll({
