@@ -55,6 +55,10 @@ function getTrendValue(videoCount: number, startDate: number,  endDate: number):
     return hours * videoCount;
 }
 
+function getPrevTrendVideoCount(trend: TrendStemmedWord) {
+    return trend.videoCount - (trend.added - trend.removed);
+}
+
 function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, startDate: number,  endDate: number): [number, number] {
     let currentTrend = trendStemmedWordList[index];
 
@@ -67,17 +71,24 @@ function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, s
     }
 
     if (currentTrend.date.getTime() >= endDate) {
-        const videoCount = currentTrend.videoCount - (currentTrend.added - currentTrend.removed);
+        const videoCount = getPrevTrendVideoCount(currentTrend);
         return [index, getTrendValue(videoCount, startDate, endDate)];
     }
 
     let value = 0;
+    let prevStartDate = startDate;
     do {
-        value = getTrendValue(currentTrend.videoCount, startDate, Math.min(currentTrend.date.getTime(), endDate));
+        const prevTrendVideoCount = getPrevTrendVideoCount(currentTrend);
+        value += getTrendValue(prevTrendVideoCount, prevStartDate,  Math.min(currentTrend.date.getTime(), endDate));
+        prevStartDate = currentTrend.date.getTime();
         if (index < (trendStemmedWordList.length - 1)) {
             currentTrend = trendStemmedWordList[++index];
         }
     } while (index < (trendStemmedWordList.length - 1) && currentTrend.date.getTime() <= endDate);
+
+    if (currentTrend.date.getTime() <= endDate) {
+        value += getTrendValue(currentTrend.videoCount, currentTrend.date.getTime(), endDate);
+    }
 
     return [index, value];
 }
@@ -109,13 +120,16 @@ async function getWordTrends(stemmedWord: string, dateRange: DateRange) {
             }
         }
 
-        const startDate = dateRange.startDate ? dateRange.startDate : trendStemmedWordList[0].date;
-        startDate.setHours(0, 0, 0, 0);
         const endDate = dateRange.endDate ? dateRange.endDate : new Date();
-        startDate.setHours(23, 59, 59, 0);
         const interval = trendsInterval;
-        const data = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
-        return {startDate, endDate, interval, data};
+        if (trendStemmedWordList.length > 0) {
+            const startDate = dateRange.startDate ? dateRange.startDate : trendStemmedWordList[0].date;
+
+            const data = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
+            return {startDate : new Date(startDate.getTime() - trendsInterval / 2), endDate, interval, data};
+        }
+
+        return {startDate: dateRange.startDate, endDate: dateRange.endDate, interval, data: []};
     }
 
     return [];

@@ -132,10 +132,12 @@ declare const videoId: string;
         }, {
             color: chartColors.green,
             name: "Лайки-дельта",
+            visible: false,
             data: [],
         }, {
             color: chartColors.red,
             name: "Дизлайки-дельта",
+            visible: false,
             data: [],
         }];
 

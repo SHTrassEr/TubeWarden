@@ -14,7 +14,6 @@
             const sr = {
                 color: colors[series.length],
                 name: d.word,
-                step: "center",
                 pointStart: (new Date(d.trends.startDate)).getTime(),
                 pointInterval: d.trends.interval,
                 data: d.trends.data,
@@ -71,8 +70,8 @@
         const start = moment($("#dStart").val() as string);
         const end = moment($("#dEnd").val() as string);
         return {
-            startDate: start.isValid() ? start.valueOf() : null,
-            endDate: end.isValid() ? end.valueOf() : null,
+            startDate: start.isValid() ? start.toISOString() : (new Date(2017, 11, 31)).toISOString(),
+            endDate: end.isValid() ? end.toISOString() : null,
         };
     }
 
