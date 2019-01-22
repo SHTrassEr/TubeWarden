@@ -10,7 +10,7 @@ const summaryService = new SummaryService();
 
 export async function index(req: Request, res: Response) {
     const videoListLike = await Video.findAll({
-        limit: 50,
+        limit: 20,
         order: [
             ["createdAt", "DESC"],
         ],
@@ -18,7 +18,7 @@ export async function index(req: Request, res: Response) {
     });
 
     const videoListDislike = await Video.findAll({
-        limit: 50,
+        limit: 20,
         order: [
             ["createdAt", "DESC"],
         ],

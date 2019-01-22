@@ -93,17 +93,19 @@ function getNextTrend(trendStemmedWordList: TrendStemmedWord[], index: number, s
     return [index, value];
 }
 
-function createTrendsData(trendStemmedWordList: TrendStemmedWord[], interval: number, startDate: Date, endDate: Date): number[] {
+function createTrendsData(trendStemmedWordList: TrendStemmedWord[], interval: number, startDate: Date, endDate: Date): [number, number[]] {
     const result: number[] = [];
+    let total = 0;
     if (trendStemmedWordList.length > 0) {
         let trendIndex = 0;
         let value = 0;
         for (let d = startDate.getTime() - interval; d < endDate.getTime(); d += interval) {
             [trendIndex, value] = getNextTrend(trendStemmedWordList, trendIndex, d, (d + interval));
+            total += value;
             result.push(Math.floor(value));
         }
     }
-    return result;
+    return [Math.floor(total), result];
 }
 
 const trendsInterval = 1000 * 60 * 60 * 24;
@@ -120,13 +122,12 @@ async function getWordTrends(stemmedWord: string, dateRange: DateRange) {
             }
         }
 
-        const endDate = dateRange.endDate ? dateRange.endDate : new Date();
+        const endDate = (dateRange.endDate && dateRange.endDate < new Date()) ? dateRange.endDate : new Date();
         const interval = trendsInterval;
         if (trendStemmedWordList.length > 0) {
             const startDate = dateRange.startDate ? dateRange.startDate : trendStemmedWordList[0].date;
-
-            const data = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
-            return {startDate : new Date(startDate.getTime() - trendsInterval / 2), endDate, interval, data};
+            const [total, data] = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
+            return {startDate : new Date(startDate.getTime() - trendsInterval / 2), endDate, interval, total, data};
         }
 
         return {startDate: dateRange.startDate, endDate: dateRange.endDate, interval, data: []};

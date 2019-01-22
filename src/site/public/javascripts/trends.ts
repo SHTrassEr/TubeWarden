@@ -13,7 +13,7 @@
         for (const d of data) {
             const sr = {
                 color: colors[series.length],
-                name: d.word,
+                name: d.word + " (" + d.trends.total + ")",
                 pointStart: (new Date(d.trends.startDate)).getTime(),
                 pointInterval: d.trends.interval,
                 data: d.trends.data,
@@ -84,27 +84,44 @@
         };
     }
 
-    function updateChart() {
-        $.getJSON("/api/trendsWordList", getApiRequestData(), (data) => {
-            initTrendsChart(data, "trendsChart");
-        });
+    function updateChart(updateHistory?: boolean) {
+        const requestData = getApiRequestData();
+        if (requestData.s) {
+            if (updateHistory && window.history && window.history.pushState) {
+                let params = "s=" + encodeURIComponent(requestData.s);
+                const start = moment($("#dStart").val() as string);
+                const end = moment($("#dEnd").val() as string);
+                if (start.isValid()) {
+                    params += "&start=" + start.toISOString();
+                }
+                if (end.isValid()) {
+                    params += "&end=" + end.toISOString();
+                }
+
+                window.history.pushState("", "", "/trends?" + params);
+            }
+
+            $.getJSON("/api/trendsWordList", requestData, (data) => {
+                initTrendsChart(data, "trendsChart");
+            });
+        }
     }
 
     $(document).ready(() => {
-        $("#btnSubmit").click(updateChart);
+        $("#btnSubmit").click(() => updateChart(true));
 
         $(".date-range").on("date-range:changed", (e) => {
-            updateChart();
+            updateChart(true);
         });
 
         $("#tbQuery").on("keypress", (e) => {
             if (e.which === 13) {
-                updateChart();
+                updateChart(true);
             }
         });
 
         if (getQuery()) {
-            updateChart();
+            updateChart(false);
         }
     });
 })();

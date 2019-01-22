@@ -5,10 +5,14 @@ block content
   div.list-header
     h3 Подозрение на накрутку лайков
     div Последние видео из трендов Youtube у которых в графике изменения количества лайков замечены резкие перепады
-
   div.list-group.list-video-group
     each video in videoListLike
       include includes/item.pug
+
+  nav
+    ul.pager
+      li.next
+        a(href="/videos/like") Дальше
           
 
   div.list-header
@@ -16,7 +20,12 @@ block content
     div Последние видео из трендов Youtube у которых в графике изменения количества дизлайков замечены резкие перепады
   div.list-group.list-video-group
     each video in videoListDislike
-      include includes/item.pug    
+      include includes/item.pug
+
+  nav
+    ul.pager
+      li.next
+        a(href="/videos/dislike") Дальше
 
 
   div.panel.panel-default
