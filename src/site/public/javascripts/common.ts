@@ -86,7 +86,10 @@ function initDateRangeList() {
     });
 
     $(".date-range").on("cancel.daterangepicker", function(ev, picker) {
-        setDate($(this), null, null);
+        const $element = $(this);
+        setDate($element, null, null);
+        $element.trigger("date-range:changed");
+        $element.closest("form").submit();
     });
 
 }

@@ -122,10 +122,13 @@ async function getWordTrends(stemmedWord: string, dateRange: DateRange) {
             }
         }
 
-        const endDate = (dateRange.endDate && dateRange.endDate < new Date()) ? dateRange.endDate : new Date();
+        const minDate = new Date(2017, 11, 30);
+        const maxDate = new Date();
+
+        const endDate = (dateRange.endDate && dateRange.endDate < maxDate) ? dateRange.endDate : maxDate;
         const interval = trendsInterval;
         if (trendStemmedWordList.length > 0) {
-            const startDate = dateRange.startDate ? dateRange.startDate : trendStemmedWordList[0].date;
+            const startDate = (dateRange.startDate && dateRange.startDate > minDate) ? dateRange.startDate : trendStemmedWordList[0].date;
             const [total, data] = createTrendsData(trendStemmedWordList, interval, startDate, endDate);
             return {startDate : new Date(startDate.getTime() - trendsInterval / 2), endDate, interval, total, data};
         }
