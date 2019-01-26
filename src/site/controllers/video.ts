@@ -10,6 +10,10 @@ export async function getVideo(req: Request, res: Response) {
             videoId: req.params.videoId,
         },
     });
+    if (!video) {
+        res.render("pageNotFound");
+        return;
+    }
 
     res.render("video", { video });
 }

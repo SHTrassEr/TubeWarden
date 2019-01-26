@@ -12,6 +12,12 @@ export async function getChannel(req: Request, res: Response) {
         },
     });
 
+    if (!channel) {
+        res.render("pageNotFound");
+        return;
+    }
+
+
     const videoList = await Video.findAll({
         order: [
             ["createdAt", "DESC"],
